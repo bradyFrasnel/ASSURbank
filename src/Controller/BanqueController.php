@@ -177,7 +177,6 @@ class BanqueController extends AbstractController
         if ($request->isMethod('POST')) {
             $clientId = $request->request->get('client_id');
             $type = $request->request->get('type');
-            $devise = $request->request->get('devise', 'EUR');
 
             $client = $clientRepository->find($clientId);
 
@@ -192,7 +191,6 @@ class BanqueController extends AbstractController
             $compte->setNumeroCompte($numeroCompte);
             $compte->setType($type);
             $compte->setSolde(0.00);
-            $compte->setDevise($devise);
             $compte->setStatut('actif');
             $compte->setDateCreation(new \DateTimeImmutable());
             $compte->setClient($client);

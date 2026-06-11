@@ -35,7 +35,7 @@
                                 <select class="form-select" id="compte_source" name="compte_source" required>
                                     {% for compte in comptes %}
                                         <option value="{{ compte.id }}">
-                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} {{ compte.devise }}
+                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} FCFA
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -45,7 +45,7 @@
                                 <select class="form-select" id="compte_destination" name="compte_destination" required>
                                     {% for compte in comptes %}
                                         <option value="{{ compte.id }}">
-                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} {{ compte.devise }}
+                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} FCFA
                                         </option>
                                     {% endfor %}
                                 </select>

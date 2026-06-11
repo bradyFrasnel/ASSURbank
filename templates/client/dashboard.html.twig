@@ -26,8 +26,7 @@
                                 <tr>
                                     <th>Numéro</th>
                                     <th>Type</th>
-                                    <th>Solde</th>
-                                    <th>Devise</th>
+                                    <th>Solde (FCFA)</th>
                                     <th>Statut</th>
                                 </tr>
                             </thead>
@@ -37,7 +36,6 @@
                                         <td>{{ compte.numeroCompte }}</td>
                                         <td>{{ compte.type }}</td>
                                         <td>{{ compte.solde|number_format(2, ',', ' ') }}</td>
-                                        <td>{{ compte.devise }}</td>
                                         <td>
                                             <span class="badge bg-{{ compte.statut == 'actif' ? 'success' : 'danger' }}">
                                                 {{ compte.statut }}

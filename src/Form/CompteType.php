@@ -27,15 +27,6 @@ class CompteType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control']
             ])
-            ->add('devise', ChoiceType::class, [
-                'label' => 'Devise',
-                'choices' => [
-                    'EUR' => 'EUR',
-                    'USD' => 'USD',
-                    'GBP' => 'GBP',
-                ],
-                'attr' => ['class' => 'form-control']
-            ])
         ;
     }
 

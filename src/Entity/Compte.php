@@ -30,9 +30,6 @@ class Compte
     #[ORM\Column]
     private ?\DateTimeImmutable $dateCreation = null;
 
-    #[ORM\Column(length: 3)]
-    private ?string $devise = 'EUR';
-
     #[ORM\ManyToOne(inversedBy: 'comptes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Client $client = null;
@@ -121,18 +118,6 @@ class Compte
     public function setClient(?Client $client): static
     {
         $this->client = $client;
-
-        return $this;
-    }
-
-    public function getDevise(): ?string
-    {
-        return $this->devise;
-    }
-
-    public function setDevise(string $devise): static
-    {
-        $this->devise = $devise;
 
         return $this;
     }

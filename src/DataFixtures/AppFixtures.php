@@ -73,7 +73,6 @@ class AppFixtures extends Fixture
         $compte->setNumeroCompte('FR1234567890123456789012345');
         $compte->setType('courant');
         $compte->setSolde(1000.00);
-        $compte->setDevise('EUR');
         $compte->setStatut('actif');
         $compte->setDateCreation($dateNow);
         $compte->setClient($client);
