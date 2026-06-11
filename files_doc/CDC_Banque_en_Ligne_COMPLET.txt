@@ -1,0 +1,708 @@
+╔════════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                    ║
+║                        CAHIER DES CHARGES - VERSION 2.1                           ║
+║                                                                                    ║
+║                         SYSTÈME DE BANQUE EN LIGNE                                ║
+║                                                                                    ║
+║                            PROJET ACADÉMIQUE                                      ║
+║                                                                                    ║
+╚════════════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INFORMATIONS DU DOCUMENT
+
+Date:                     10 juin 2026
+Version:                  2.1 - Corrigée et finalisée
+Type de projet:           Académique
+Stack technique:          Symfony 7 + Twig + Bootstrap + PostgreSQL
+Symfony CLI:              5.17.1
+Tables de données:        4 (Banque, Client, Compte, Transaction)
+Rôles utilisateurs:       Admin, Banque, Client
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TABLE DES MATIÈRES
+
+1. Présentation du projet
+2. Objectifs spécifiques
+3. Périmètre fonctionnel
+4. Besoins fonctionnels
+5. Besoins non-fonctionnels
+6. Règles métier
+7. Architecture technique
+8. Modèle de données (4 Tables)
+9. Diagrammes UML
+10. Livrables
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. PRÉSENTATION DU PROJET
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONTEXTE
+────────
+Dans le cadre d'un projet académique, il est demandé de concevoir et développer une 
+plateforme web permettant à des banques de gérer leurs clients et leurs comptes 
+bancaires à travers une interface web sécurisée. Cette plateforme doit permettre à 
+plusieurs banques de créer leur espace et de gérer indépendamment leurs clients.
+
+OBJECTIF GÉNÉRAL
+─────────────────
+Développer une plateforme multi-banque permettant:
+  • Aux banques de créer un compte et de gérer leurs clients
+  • Aux clients de créer un compte et de choisir leur banque
+  • Aux clients de consulter leurs comptes et d'effectuer des virements
+  • À un administrateur de superviser l'ensemble du système
+
+
+2. OBJECTIFS SPÉCIFIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le système devra permettre:
+
+  ✓ Permettre aux banques de créer un compte et de gérer leurs clients
+  ✓ Permettre aux clients de créer un compte et de choisir leur banque
+  ✓ Permettre aux clients de consulter leurs comptes et soldes
+  ✓ Permettre aux clients d'effectuer des virements internes sécurisés
+  ✓ Permettre à l'administrateur de gérer les banques et les statistiques globales
+  ✓ Permettre aux banques de gérer l'activation/désactivation des comptes clients
+
+
+3. PÉRIMÈTRE FONCTIONNEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.1 ESPACE ADMIN
+─────────────────
+  • Gestion des banques (création, activation/désactivation)
+  • Consultation des statistiques globales
+    - Nombre de banques actives
+    - Nombre de clients total
+    - Volume de transactions
+
+
+3.2 ESPACE BANQUE
+──────────────────
+  • Gestion des clients (activation/désactivation de comptes)
+  • Consultation des clients et leurs comptes
+  • Consultation des transactions de ses clients
+  • Consultation de ses statistiques
+    - Nombre de ses clients
+    - Nombre de comptes actifs
+    - Montant total géré
+
+
+3.3 ESPACE CLIENT
+──────────────────
+  • Inscription et sélection de sa banque
+  • Authentification sécurisée (connexion/déconnexion)
+  • Modification du mot de passe
+  • Consultation des comptes et soldes
+  • Effectuer un virement interne
+  • Consultation de l'historique des transactions
+  • Recherche et filtrage des opérations
+
+
+4. BESOINS FONCTIONNELS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4.1 GESTION DES BANQUES
+────────────────────────
+  ✓ Créer une banque
+  ✓ Activer/désactiver une banque
+  ✓ Consulter la liste des banques
+  ✓ Modifier les informations d'une banque
+
+
+4.2 GESTION DES CLIENTS
+────────────────────────
+  ✓ Créer un client (inscription)
+  ✓ Modifier un client
+  ✓ Supprimer ou désactiver un client
+  ✓ Gérer l'association client-banque
+
+
+4.3 GESTION DES COMPTES
+────────────────────────
+  ✓ Créer un compte bancaire
+  ✓ Consulter le solde et les informations du compte
+  ✓ Activer/désactiver un compte
+  ✓ Mettre à jour les informations du compte
+
+
+4.4 GESTION DES TRANSACTIONS
+──────────────────────────────
+  ✓ Effectuer un virement entre comptes
+  ✓ Vérifier le solde disponible
+  ✓ Enregistrer automatiquement les opérations
+  ✓ Générer l'historique des transactions
+  ✓ Gérer les statuts de transaction (succès/échec)
+
+
+5. BESOINS NON-FONCTIONNELS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5.1 SÉCURITÉ
+─────────────
+  ✓ Chiffrement des mots de passe (Argon2 / bcrypt)
+  ✓ Contrôle d'accès basé sur les rôles (RBAC)
+    - ROLE_ADMIN: gestion globale
+    - ROLE_BANQUE: gestion de ses clients
+    - ROLE_CLIENT: accès à ses comptes
+  ✓ Validation des données saisies côté serveur
+  ✓ Protection contre les attaques courantes (CSRF, XSS, SQL Injection)
+  ✓ HTTPS obligatoire en production
+
+
+5.2 PERFORMANCE
+────────────────
+  ✓ Temps de réponse inférieur à 3 secondes
+  ✓ Pagination des listes longues
+  ✓ Indexation des bases de données
+
+
+5.3 DISPONIBILITÉ ET ERGONOMIE
+────────────────────────────────
+  ✓ Application accessible 24h/24 en environnement de test
+  ✓ Interface simple et intuitive
+  ✓ Compatible ordinateur et mobile (responsive design)
+  ✓ Messages d'erreur clairs et explicites
+
+
+6. RÈGLES MÉTIER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RÈGLE R1 - VIREMENT INSUFFISANT                                              │
+│─────────────────────────────────────────────────────────────────────────────│
+│ Description:  Un virement est refusé si le solde du compte source est        │
+│               insuffisant. La transaction est enregistrée avec le statut     │
+│               ECHOUE.                                                         │
+│ Impact:       Protection de la solvabilité                                   │
+│ Implémentation: Vérifier solde >= montant avant d'effectuer le virement     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RÈGLE R2 - COMPTE DÉSACTIVÉ                                                  │
+│─────────────────────────────────────────────────────────────────────────────│
+│ Description:  Un compte désactivé ne peut ni émettre ni recevoir de         │
+│               virement.                                                       │
+│ Impact:       Contrôle d'accès au compte                                     │
+│ Implémentation: Vérifier statut='actif' pour la source et destination       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RÈGLE R3 - SOLDE POSITIF                                                     │
+│─────────────────────────────────────────────────────────────────────────────│
+│ Description:  Le solde d'un compte ne peut jamais être négatif.             │
+│ Impact:       Intégrité des données                                          │
+│ Implémentation: Solde >= 0 toujours (constraint CHECK ou validation)        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ RÈGLE R4 - TRANSACTIONS DUPLIQUÉES                                            │
+│─────────────────────────────────────────────────────────────────────────────│
+│ Description:  Un virement réussi crée 2 transactions: débit sur le compte   │
+│               source, crédit sur le compte destination.                      │
+│ Impact:       Cohérence comptable                                            │
+│ Implémentation: Créer 2 entrées de transaction (type='débit' et type='crédit')
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+7. ARCHITECTURE TECHNIQUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌────────────────────┬──────────────────────────┬──────────────┐
+│ Composant          │ Technologie              │ Version      │
+├────────────────────┼──────────────────────────┼──────────────┤
+│ Backend            │ Symfony Framework        │ 7            │
+│ CLI                │ Symfony CLI              │ 5.17.1       │
+│ Frontend           │ Twig + Bootstrap         │ 5            │
+│ Base de données    │ PostgreSQL               │ 14+          │
+│ Gestion versions   │ Git / GitHub             │ Latest       │
+│ Templates          │ Twig (Symfony natif)     │ Latest       │
+│ ORM                │ Doctrine                 │ Latest       │
+└────────────────────┴──────────────────────────┴──────────────┘
+
+ARCHITECTURE GÉNÉRALE
+──────────────────────
+Backend:
+  Symfony 7 fournit les contrôleurs et services pour la gestion des banques,
+  clients, comptes et transactions via des routes HTTP/REST.
+
+Frontend:
+  Twig (moteur de templates Symfony natif) avec Bootstrap pour une interface
+  responsive et accessible sur ordinateur et mobile.
+
+Base de données:
+  PostgreSQL pour la persistance des données avec support des transactions ACID
+  et intégrité référentielle.
+
+Déploiement:
+  Docker Compose pour un environnement reproductible:
+    - Service Symfony (port 8000)
+    - Service PostgreSQL (port 5432)
+    - Nginx/Apache pour servir l'application
+
+
+8. MODÈLE DE DONNÉES (4 TABLES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8.1 TABLE: BANQUE
+──────────────────
+
+Description: Représente les banques enregistrées sur la plateforme
+
+Champs:
+  • id (INT, PRIMARY KEY)
+    - Identifiant unique
+
+  • nom (VARCHAR(100), NOT NULL)
+    - Nom de la banque
+
+  • email (VARCHAR(100), UNIQUE, NOT NULL)
+    - Email de contact
+
+  • mot_de_passe (VARCHAR(255), NOT NULL)
+    - Mot de passe chiffré avec Argon2
+
+  • téléphone (VARCHAR(20))
+    - Numéro de téléphone
+
+  • statut (ENUM: 'actif', 'inactif', DEFAULT 'actif')
+    - État de la banque
+
+  • date_création (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+    - Date d'inscription
+
+  • rôle (VARCHAR(50), DEFAULT 'ROLE_BANQUE')
+    - Rôle toujours fixé à 'ROLE_BANQUE'
+
+Contraintes:
+  - PRIMARY KEY (id)
+  - UNIQUE (email)
+  - CHECK (statut IN ('actif', 'inactif'))
+
+
+8.2 TABLE: CLIENT
+──────────────────
+
+Description: Représente les clients (utilisateurs) du système (clients et admin)
+
+Champs:
+  • id (INT, PRIMARY KEY)
+    - Identifiant unique
+
+  • nom (VARCHAR(100), NOT NULL)
+    - Nom du client
+
+  • prénom (VARCHAR(100), NOT NULL)
+    - Prénom du client
+
+  • email (VARCHAR(100), UNIQUE, NOT NULL)
+    - Email du client
+
+  • mot_de_passe (VARCHAR(255), NOT NULL)
+    - Mot de passe chiffré avec Argon2
+
+  • téléphone (VARCHAR(20))
+    - Numéro de téléphone
+
+  • rôle (ENUM: 'ROLE_CLIENT', 'ROLE_ADMIN', DEFAULT 'ROLE_CLIENT')
+    - Rôle de l'utilisateur dans le système
+    - ROLE_CLIENT: client d'une banque
+    - ROLE_ADMIN: administrateur global (banque_id peut être NULL)
+
+  • statut (ENUM: 'actif', 'inactif', DEFAULT 'actif')
+    - État du compte client
+
+  • date_création (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+    - Date d'inscription
+
+  • banque_id (INT, FOREIGN KEY → Banque(id), NULLABLE)
+    - Référence à la banque associée
+    - NULL si l'utilisateur est ROLE_ADMIN
+
+Contraintes:
+  - PRIMARY KEY (id)
+  - UNIQUE (email)
+  - FOREIGN KEY (banque_id) REFERENCES Banque(id)
+  - CHECK (rôle IN ('ROLE_CLIENT', 'ROLE_ADMIN'))
+  - CHECK (statut IN ('actif', 'inactif'))
+
+
+8.3 TABLE: COMPTE
+───────────────────
+
+Description: Représente les comptes bancaires des clients
+
+Champs:
+  • id (INT, PRIMARY KEY)
+    - Identifiant unique
+
+  • numéro_compte (VARCHAR(50), UNIQUE, NOT NULL)
+    - Numéro IBAN ou compte unique
+
+  • type (ENUM: 'courant', 'épargne', 'titre', DEFAULT 'courant')
+    - Type de compte
+
+  • solde (DECIMAL(15,2), NOT NULL, DEFAULT 0.00)
+    - Solde actuel (doit toujours être >= 0)
+
+  • devise (VARCHAR(3), DEFAULT 'EUR')
+    - Code devise (EUR, USD, GBP, etc.)
+
+  • statut (ENUM: 'actif', 'inactif', DEFAULT 'actif')
+    - État du compte
+
+  • date_création (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+    - Date d'ouverture
+
+  • client_id (INT, FOREIGN KEY → Client(id), NOT NULL)
+    - Propriétaire du compte
+
+Contraintes:
+  - PRIMARY KEY (id)
+  - UNIQUE (numéro_compte)
+  - FOREIGN KEY (client_id) REFERENCES Client(id) ON DELETE CASCADE
+  - CHECK (solde >= 0)
+  - CHECK (type IN ('courant', 'épargne', 'titre'))
+  - CHECK (statut IN ('actif', 'inactif'))
+
+
+8.4 TABLE: TRANSACTION
+───────────────────────
+
+Description: Enregistre tous les mouvements financiers
+
+Champs:
+  • id (INT, PRIMARY KEY)
+    - Identifiant unique
+
+  • montant (DECIMAL(15,2), NOT NULL)
+    - Montant de la transaction (>= 0)
+
+  • type (ENUM: 'débit', 'crédit', NOT NULL)
+    - Type d'opération
+
+  • libellé (VARCHAR(255), NOT NULL)
+    - Description de l'opération
+    - Ex: "Virement vers compte xxx", "Retrait ATM", etc.
+
+  • frais (DECIMAL(15,2), DEFAULT 0.00)
+    - Frais appliqués à la transaction
+
+  • date_transaction (TIMESTAMP, DEFAULT CURRENT_TIMESTAMP)
+    - Date et heure exacte de l'opération
+
+  • compte_source_id (INT, FOREIGN KEY → Compte(id), NULLABLE)
+    - Compte d'origine
+    - NULL si transaction initiale/dépôt
+
+  • compte_destination_id (INT, FOREIGN KEY → Compte(id), NULLABLE)
+    - Compte destinataire
+    - NULL si retrait/frais
+
+  • statut (ENUM: 'succès', 'échoué', NOT NULL)
+    - Résultat de la transaction
+
+Contraintes:
+  - PRIMARY KEY (id)
+  - FOREIGN KEY (compte_source_id) REFERENCES Compte(id) ON DELETE SET NULL
+  - FOREIGN KEY (compte_destination_id) REFERENCES Compte(id) ON DELETE SET NULL
+  - CHECK (montant > 0)
+  - CHECK (type IN ('débit', 'crédit'))
+  - CHECK (statut IN ('succès', 'échoué'))
+
+
+RELATIONS ENTRE LES TABLES
+───────────────────────────
+
+1. Banque (1) --crée--> (*) Client
+   • Une banque peut avoir plusieurs clients
+   • Un client appartient à une seule banque (sauf admin)
+   • Cardinalité: 1..n
+
+2. Client (1) --possède--> (*) Compte
+   • Un client peut avoir plusieurs comptes
+   • Un compte appartient à un seul client
+   • Cardinalité: 1..n
+
+3. Compte (1) --génère--> (*) Transaction
+   • Un compte peut avoir plusieurs transactions
+   • Une transaction est associée à 1 ou 2 comptes
+   • Cardinalité: 1..n
+
+4. Transaction relie 2 comptes
+   • compte_source_id: compte qui sort l'argent
+   • compte_destination_id: compte qui reçoit l'argent
+
+
+ÉNUMÉRATIONS (ENUM)
+────────────────────
+
+statut (Banque, Client, Compte):
+  • 'actif'   - L'entité est active
+  • 'inactif' - L'entité est désactivée
+
+rôle (Client):
+  • 'ROLE_CLIENT' - Client d'une banque
+  • 'ROLE_ADMIN'  - Administrateur global du système
+
+rôle (Banque):
+  • 'ROLE_BANQUE' - Toujours cette valeur pour les banques
+
+type_compte (Compte):
+  • 'courant'  - Compte courant
+  • 'épargne'  - Compte épargne
+  • 'titre'    - Compte titre
+
+type_transaction (Transaction):
+  • 'débit'    - Argent qui sort
+  • 'crédit'   - Argent qui entre
+
+statut_transaction (Transaction):
+  • 'succès'   - Transaction réussie
+  • 'échoué'   - Transaction échouée
+
+
+9. DIAGRAMMES UML
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9.1 DIAGRAMME DE CAS D'UTILISATION
+────────────────────────────────────
+
+         ┌────────────────────────────────────────────────────┐
+         │     SYSTÈME DE BANQUE EN LIGNE                      │
+         │                                                      │
+         │  ┌──────────────────┐                               │
+         │  │ Gérer Banques    │                               │
+         │  └──────────────────┘                               │
+         │         ▲                                            │
+         │         │                                            │
+         │  ┌──────────────────┐                               │
+    Admin│─┤ Consulter Stat.   │                               │
+         │  └──────────────────┘                               │
+         │                                                      │
+         │  ┌──────────────────┐                               │
+         │  │ Activer/Désact.  │                               │
+         │  │ Comptes          │                               │
+         │  └──────────────────┘                               │
+         │         ▲                                            │
+         │         │                                            │
+    Banque├────────┤                                            │
+         │  ┌──────────────────┐                               │
+         │  │ Voir ses Clients │                               │
+         │  └──────────────────┘                               │
+         │                                                      │
+         │  ┌──────────────────┐                               │
+         │  │ Consulter Solde  │                               │
+         │  └──────────────────┘                               │
+         │         ▲                                            │
+         │         │                                            │
+   Client├────────┤                                            │
+         │  ┌──────────────────┐                               │
+         │  │ Effectuer        │                               │
+         │  │ Virement         │                               │
+         │  └──────────────────┘                               │
+         │                                                      │
+         └────────────────────────────────────────────────────┘
+
+Acteurs:
+  • Admin: Administrateur système - gère les banques
+  • Banque: Représentant d'une banque - gère ses clients
+  • Client: Client d'une banque - gère ses comptes
+
+
+9.2 DIAGRAMME DE CLASSES (MODÈLE DE DONNÉES)
+──────────────────────────────────────────────
+
+┌──────────────────────┐     1     ┌──────────────────────┐
+│      BANQUE          │◄──crée─── │      CLIENT          │
+├──────────────────────┤           ├──────────────────────┤
+│ - id: int            │     *     │ - id: int            │
+│ - nom: string        │           │ - nom: string        │
+│ - email: string      │           │ - prénom: string     │
+│ - mot_de_passe       │           │ - email: string      │
+│ - téléphone: string  │           │ - mot_de_passe       │
+│ - statut: enum       │           │ - téléphone: string  │
+│ - date_création      │           │ - rôle: enum         │
+│ - rôle: string       │           │ - statut: enum       │
+├──────────────────────┤           │ - date_création      │
+│ + getClients()       │           │ - banque_id: FK      │
+│ + getStats()         │           ├──────────────────────┤
+└──────────────────────┘           │ + authentifier()     │
+                                   │ + changerMotDePasse()│
+                                   └──────────────────────┘
+                                            │
+                                            │ 1
+                                          possède
+                                            │ *
+                                            ▼
+                                   ┌──────────────────────┐
+                                   │      COMPTE          │
+                                   ├──────────────────────┤
+                                   │ - id: int            │
+                                   │ - numéro_compte      │
+                                   │ - type: enum         │
+                                   │ - solde: decimal     │
+                                   │ - devise: string     │
+                                   │ - statut: enum       │
+                                   │ - date_création      │
+                                   │ - client_id: FK      │
+                                   ├──────────────────────┤
+                                   │ + consulterSolde()   │
+                                   │ + effectuerVirement()│
+                                   └──────────────────────┘
+                                            │
+                                            │ 1
+                                          génère
+                                            │ *
+                                            ▼
+                                   ┌──────────────────────┐
+                                   │    TRANSACTION       │
+                                   ├──────────────────────┤
+                                   │ - id: int            │
+                                   │ - montant: decimal   │
+                                   │ - type: enum         │
+                                   │ - libellé: string    │
+                                   │ - frais: decimal     │
+                                   │ - date_transaction   │
+                                   │ - compte_source_id   │
+                                   │ - compte_destination │
+                                   │ - statut: enum       │
+                                   ├──────────────────────┤
+                                   │ + validerVirement()  │
+                                   │ + enregistrerEchec() │
+                                   └──────────────────────┘
+
+Légende:
+  - Attribut privé
+  + Méthode publique
+  FK = Clé étrangère
+  1 = Un / * = Plusieurs
+
+
+10. LIVRABLES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+À la fin du projet, les livrables suivants doivent être fournis:
+
+  ✓ Cahier des charges (ce document)
+  ✓ Diagramme de cas d'utilisation UML
+  ✓ Diagramme de classes UML (4 tables)
+  ✓ Code source (Symfony 7 + Twig + Bootstrap + PostgreSQL)
+  ✓ Migrations de base de données (Doctrine ORM)
+  ✓ Documentation technique (README.md)
+  ✓ Docker Compose pour environnement de test
+  ✓ Rapport final de réalisation
+  ✓ Présentation PowerPoint de soutenance
+
+
+CRITÈRES D'ACCEPTATION
+──────────────────────
+
+Avant la soutenance, vérifier que:
+
+  ✓ Tous les cas d'utilisation sont fonctionnels
+  ✓ Les règles métier (R1-R4) sont correctement implémentées
+  ✓ La sécurité (authentification/autorisation) fonctionne
+  ✓ Le modèle de données à 4 tables est respecté
+  ✓ L'application est responsive et compatible mobile
+  ✓ La base de données est correctement structurée avec intégrité référentielle
+  ✓ Les tests sont positifs
+  ✓ Le code est bien documenté
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RÉSUMÉ EXÉCUTIF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ce projet académique vise à développer une plateforme bancaire en ligne permettant
+à plusieurs banques de gérer leurs clients indépendamment.
+
+Points clés:
+
+  • ARCHITECTURE: Symfony 7 backend + Twig frontend + PostgreSQL database
+  • STRUCTURE: 4 tables (Banque, Client, Compte, Transaction)
+  • RÔLES: 3 rôles distincts (Admin, Banque, Client)
+  • SÉCURITÉ: Authentification + RBAC + Chiffrement des mots de passe
+  • RÈGLES MÉTIER: 4 règles fondamentales implémentées
+  • RESPONSIF: Compatible ordinateur et mobile
+
+Le système permet:
+  • Aux banques de gérer leurs clients
+  • Aux clients de consulter leurs comptes et effectuer des virements
+  • À l'admin de superviser le système
+
+Toutes les fonctionnalités sont documentées et prêtes pour l'implémentation.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTES TECHNIQUES IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. SÉCURITÉ DES MOTS DE PASSE
+   Utiliser Symfony Security Bundle avec Argon2 pour le hachage des mots de passe.
+   Jamais stocker les mots de passe en clair.
+
+2. CONTRÔLE D'ACCÈS (RBAC)
+   Utiliser les rôles Symfony:
+   - @IsGranted("ROLE_ADMIN")
+   - @IsGranted("ROLE_BANQUE")
+   - @IsGranted("ROLE_CLIENT")
+
+3. VALIDATION DES DONNÉES
+   Valider tous les montants, soldes, et données saisies côté serveur.
+   Utiliser Symfony Validator Bundle.
+
+4. TRANSACTIONS ATOMIQUES
+   Les virements doivent être transactionnels:
+   - Vérifier le solde
+   - Débiter le compte source
+   - Créditer le compte destination
+   - Créer les 2 transactions
+   Tout cela dans une transaction ACID (Doctrine).
+
+5. GESTION DES ERREURS
+   Implémenter un système robuste de gestion des erreurs avec messages clairs.
+   Enregistrer les erreurs dans les logs.
+
+6. PAGINATION
+   Pour les listes longues (clients, transactions), utiliser la pagination
+   (ex: 20 par page).
+
+7. PERFORMANCE
+   - Indexer les colonnes fréquemment recherchées (email, numéro_compte)
+   - Utiliser des query builders efficaces
+   - Implémenter la mise en cache si nécessaire
+
+8. TESTS
+   Prévoir des tests unitaires et fonctionnels:
+   - Tests des services métier
+   - Tests des contrôleurs
+   - Tests de sécurité
+
+9. DOCKER
+   Fournir un docker-compose.yml avec:
+   - Service Symfony
+   - Service PostgreSQL
+   - Volumes pour la persistance
+   - Variables d'environnement appropriées
+
+10. DOCUMENTATION
+    Fournir un README.md avec:
+    - Instructions de setup
+    - Commandes Symfony importantes
+    - Informations de connexion (comptes test)
+    - Structure du projet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fin du Cahier des Charges
+Document généré le: 10 juin 2026
+Version: 2.1 - Finalisée et corrigée
+Prêt pour soutenance académique ✓
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

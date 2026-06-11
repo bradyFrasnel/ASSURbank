@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Banque{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Dashboard - {{ banque.nom }}</h1>
+            <p>Email: {{ banque.email }}</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <h2 class="text-primary">{{ totalClients }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Comptes</h5>
+                    <h2 class="text-success">{{ totalComptes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Montant Total</h5>
+                    <h2 class="text-info">{{ montantTotal|number_format(2, ',', ' ') }} €</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Statut</h5>
+                    <h2 class="text-{{ banque.statut == 'actif' ? 'success' : 'danger' }}">{{ banque.statut }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Mes Clients</h4>
+                </div>
+                <div class="card-body">
+                    {% if clients is empty %}
+                        <p>Aucun client enregistré.</p>
+                    {% else %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in clients %}
+                                    <tr>
+                                        <td>{{ client.nom }}</td>
+                                        <td>{{ client.prenom }}</td>
+                                        <td>{{ client.email }}</td>
+                                        <td>{{ client.telephone }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ client.statut == 'actif' ? 'success' : 'danger' }}">
+                                                {{ client.statut }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('app_banque_client_show', {'id': client.id}) }}" class="btn btn-sm btn-info">Voir</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="btn-group">
+                <a href="{{ path('app_banque_clients') }}" class="btn btn-primary">Gérer les clients</a>
+                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

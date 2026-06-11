@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Client{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Bienvenue, {{ client.prenom }} {{ client.nom }}</h1>
+            <p>Email: {{ client.email }}</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Mes Comptes</h4>
+                </div>
+                <div class="card-body">
+                    {% if comptes is empty %}
+                        <p>Aucun compte disponible.</p>
+                    {% else %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Numéro</th>
+                                    <th>Type</th>
+                                    <th>Solde</th>
+                                    <th>Devise</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for compte in comptes %}
+                                    <tr>
+                                        <td>{{ compte.numeroCompte }}</td>
+                                        <td>{{ compte.type }}</td>
+                                        <td>{{ compte.solde|number_format(2, ',', ' ') }}</td>
+                                        <td>{{ compte.devise }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ compte.statut == 'actif' ? 'success' : 'danger' }}">
+                                                {{ compte.statut }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Dernières Transactions</h4>
+                </div>
+                <div class="card-body">
+                    {% if transactions is empty %}
+                        <p>Aucune transaction récente.</p>
+                    {% else %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Montant</th>
+                                    <th>Libellé</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.dateTransaction|date('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ transaction.type == 'crédit' ? 'success' : 'danger' }}">
+                                                {{ transaction.type }}
+                                            </span>
+                                        </td>
+                                        <td>{{ transaction.montant|number_format(2, ',', ' ') }}</td>
+                                        <td>{{ transaction.libelle }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ transaction.statut == 'succès' ? 'success' : 'danger' }}">
+                                                {{ transaction.statut }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="btn-group">
+                <a href="{{ path('app_client_comptes') }}" class="btn btn-primary">Voir mes comptes</a>
+                <a href="{{ path('app_client_virement') }}" class="btn btn-success">Effectuer un virement</a>
+                <a href="{{ path('app_client_profil') }}" class="btn btn-info">Mon profil</a>
+                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

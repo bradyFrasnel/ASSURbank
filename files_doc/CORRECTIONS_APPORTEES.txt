@@ -1,0 +1,115 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║           CORRECTIONS APPORTÉES AU CDC - VERSION 2.1                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+✓ CORRECTIONS PRINCIPALES:
+
+1. MODÈLE DE DONNÉES RECTIFIÉ (4 Tables)
+   ❌ Ancien: Utilisateur (générique)
+   ✓ Nouveau: Banque + Client + Compte + Transaction
+   
+   Table BANQUE:
+   - id (INT, PK)
+   - nom, email, mot_de_passe
+   - téléphone, statut, date_création
+   - rôle = 'ROLE_BANQUE'
+
+   Table CLIENT:
+   - id (INT, PK)
+   - nom, prénom, email, mot_de_passe
+   - téléphone, rôle (ROLE_CLIENT ou ROLE_ADMIN)
+   - statut, date_création
+   - banque_id (FK → Banque)
+
+   Table COMPTE:
+   - id (INT, PK)
+   - numéro_compte, type, solde, devise
+   - statut, date_création
+   - client_id (FK → Client)
+
+   Table TRANSACTION:
+   - id (INT, PK)
+   - montant, type, libellé, frais
+   - date_transaction
+   - compte_source_id, compte_destination_id (FK)
+   - statut (succès/échoué)
+
+2. DIAGRAMME DE CLASSES CORRIGÉ
+   ❌ Ancien: "Utilisateur" au centre
+   ✓ Nouveau: 4 entités bien séparées et nommées correctement
+   - Banque (couleur rouge)
+   - Client (couleur bleue)
+   - Compte (couleur verte)
+   - Transaction (couleur jaune)
+   
+   Avec cardinalités claires:
+   • Banque (1) crée (n) Clients
+   • Client (1) possède (n) Comptes
+   • Compte (1) génère (n) Transactions
+   • Transaction relie 2 Comptes (source + destination)
+
+3. RELATIONS BIEN DÉFINES
+   ✓ Clés étrangères explicites
+   ✓ Cardinalités (1 à n)
+   ✓ Noms de relations explicites (crée, possède, génère)
+
+4. ÉNUMÉRATIONS AJOUTÉES
+   ✓ statut: [actif, inactif]
+   ✓ rôle: [ROLE_ADMIN, ROLE_BANQUE, ROLE_CLIENT]
+   ✓ type_compte: [courant, épargne, titre]
+   ✓ type_transaction: [débit, crédit]
+   ✓ statut_transaction: [succès, échoué]
+
+5. SECTION 8: MODÈLE DE DONNÉES RÉORGANISÉE
+   ❌ Ancien: Structure floue
+   ✓ Nouveau: 
+   - Chaque table est décrite en détail
+   - Tous les champs sont listés
+   - Types de données précisés
+   - Contraintes mentionnées (NOT NULL, UNIQUE, FK, etc.)
+   - Relations entre tables expliquées
+
+6. CLARIFICATIONS AJOUTÉES
+   ✓ Admin: Client avec rôle 'ROLE_ADMIN'
+   ✓ Banque: Table séparée avec authentification propre
+   ✓ Client: Table séparée avec association à une Banque
+   ✓ Comptes: Toujours liés à un Client (et donc indirectement à une Banque)
+
+═════════════════════════════════════════════════════════════════════════════
+
+✓ CONTENU DU PDF (13 pages):
+
+Page 1    : Couverture + infos document
+Page 2    : Table des matières
+Page 3    : Présentation du projet
+Page 4    : Objectifs spécifiques
+Page 5    : Périmètre fonctionnel (Admin, Banque, Client)
+Page 6-7  : Besoins fonctionnels détaillés
+Page 8    : Besoins non-fonctionnels
+Page 9    : Règles métier (R1-R4)
+Page 10   : Architecture technique (Symfony 7, Twig, PostgreSQL)
+Page 11   : Modèle de données - 4 tables détaillées
+Page 12   : Diagramme de cas d'utilisation UML
+Page 13   : Diagramme de classes UML (CORRIGÉ)
+Page 14   : Livrables et critères d'acceptation
+
+═════════════════════════════════════════════════════════════════════════════
+
+✓ PRÊT POUR LA SOUTENANCE:
+
+1. Les 4 tables sont clairement identifiées ✓
+2. Les diagrammes UML sont corrects ✓
+3. Les relations et cardinalités sont précises ✓
+4. Les règles métier sont explicites ✓
+5. L'architecture Symfony 7 + Twig est confirmée ✓
+6. Tout est professionnel et académiquement solide ✓
+
+═════════════════════════════════════════════════════════════════════════════
+
+📌 FICHIERS GÉNÉRÉS:
+- CDC_Banque_en_Ligne.pdf (document principal - 13 pages)
+- usecase_diagram.png (diagramme de cas d'utilisation)
+- class_diagram.png (diagramme de classes corrigé)
+
+Bonne soutenance demain! 🎓
+

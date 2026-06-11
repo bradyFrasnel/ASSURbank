@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Virement{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="text-center">Effectuer un Virement</h4>
+                </div>
+                <div class="card-body">
+                    {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                    {% endif %}
+
+                    {% if success %}
+                        <div class="alert alert-success">
+                            {{ success }}
+                        </div>
+                    {% endif %}
+
+                    {% if comptes is empty %}
+                        <div class="alert alert-warning">
+                            Vous n'avez aucun compte actif pour effectuer un virement.
+                        </div>
+                        <a href="{{ path('app_client_dashboard') }}" class="btn btn-primary">Retour au dashboard</a>
+                    {% else %}
+                        <form method="post">
+                            <div class="mb-3">
+                                <label for="compte_source" class="form-label">Compte source</label>
+                                <select class="form-select" id="compte_source" name="compte_source" required>
+                                    {% for compte in comptes %}
+                                        <option value="{{ compte.id }}">
+                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} {{ compte.devise }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="compte_destination" class="form-label">Compte destination</label>
+                                <select class="form-select" id="compte_destination" name="compte_destination" required>
+                                    {% for compte in comptes %}
+                                        <option value="{{ compte.id }}">
+                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} {{ compte.devise }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="montant" class="form-label">Montant</label>
+                                <input type="number" class="form-control" id="montant" name="montant" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="libelle" class="form-label">Libellé</label>
+                                <input type="text" class="form-control" id="libelle" name="libelle" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Effectuer le virement</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <a href="{{ path('app_client_dashboard') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
