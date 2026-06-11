@@ -5,18 +5,52 @@ namespace App\Controller;
 use App\Entity\Banque;
 use App\Entity\Client;
 use App\Entity\Compte;
+use App\Form\BanqueInscriptionType;
+use App\Form\CompteCreateType;
 use App\Repository\ClientRepository;
 use App\Repository\CompteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/banque')]
 class BanqueController extends AbstractController
 {
+    #[Route('/inscription', name: 'app_banque_inscription', methods: ['GET', 'POST'])]
+    public function inscription(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if ($this->isGranted('ROLE_BANQUE')) {
+            return $this->redirectToRoute('app_banque_dashboard');
+        }
+
+        $banque = new Banque();
+        $form = $this->createForm(BanqueInscriptionType::class, $banque);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $banque->setRole('ROLE_BANQUE');
+            $banque->setStatut('actif');
+            $banque->setDateCreation(new \DateTimeImmutable());
+            $banque->setPassword($passwordHasher->hashPassword($banque, $form->get('plainPassword')->getData()));
+
+            $entityManager->persist($banque);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Banque inscrite avec succès. Vous pouvez vous connecter.');
+
+            return $this->redirectToRoute('app_login_banque');
+        }
+
+        return $this->render('banque/inscription.html.twig', ['form' => $form]);
+    }
+
     #[Route('/dashboard', name: 'app_banque_dashboard', methods: ['GET'])]
     #[IsGranted('ROLE_BANQUE')]
     public function dashboard(
@@ -53,14 +87,16 @@ class BanqueController extends AbstractController
 
     #[Route('/clients', name: 'app_banque_clients', methods: ['GET'])]
     #[IsGranted('ROLE_BANQUE')]
-    public function clients(ClientRepository $clientRepository): Response
+    public function clients(Request $request, ClientRepository $clientRepository): Response
     {
         /** @var Banque $banque */
         $banque = $this->getUser();
-        $clients = $clientRepository->findBy(['banque' => $banque]);
+        $page = max(1, $request->query->getInt('page', 1));
+        $pagination = $clientRepository->findByBanquePaginated($banque, $page, 10);
 
         return $this->render('banque/clients.html.twig', [
-            'clients' => $clients,
+            'clients' => $pagination->items,
+            'pagination' => $pagination,
         ]);
     }
 
@@ -174,22 +210,23 @@ class BanqueController extends AbstractController
         /** @var Banque $banque */
         $banque = $this->getUser();
 
-        if ($request->isMethod('POST')) {
-            $clientId = $request->request->get('client_id');
-            $type = $request->request->get('type');
+        $clients = $clientRepository->findBy(['banque' => $banque, 'statut' => 'actif']);
+        $form = $this->createForm(CompteCreateType::class, null, ['clients' => $clients]);
+        $form->handleRequest($request);
 
-            $client = $clientRepository->find($clientId);
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var Client $client */
+            $client = $form->get('client')->getData();
 
-            if (!$client || $client->getBanque() !== $banque) {
+            if ($client->getBanque() !== $banque) {
                 throw $this->createAccessDeniedException('Client invalide.');
             }
 
-            // Générer un numéro de compte unique
-            $numeroCompte = 'FR' . str_pad(rand(0, 999999999999), 24, '0', STR_PAD_LEFT);
+            $numeroCompte = $this->generateNumeroCompte();
 
             $compte = new Compte();
             $compte->setNumeroCompte($numeroCompte);
-            $compte->setType($type);
+            $compte->setType($form->get('type')->getData());
             $compte->setSolde(0.00);
             $compte->setStatut('actif');
             $compte->setDateCreation(new \DateTimeImmutable());
@@ -198,13 +235,31 @@ class BanqueController extends AbstractController
             $entityManager->persist($compte);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Compte créé avec succès.');
+
             return $this->redirectToRoute('app_banque_client_show', ['id' => $client->getId()]);
         }
 
-        $clients = $clientRepository->findBy(['banque' => $banque, 'statut' => 'actif']);
+        if ($request->query->has('client_id')) {
+            $preselected = $clientRepository->find($request->query->getInt('client_id'));
+            if ($preselected && $preselected->getBanque() === $banque) {
+                $form->get('client')->setData($preselected);
+            }
+        }
 
         return $this->render('banque/compte_create.html.twig', [
+            'form' => $form,
             'clients' => $clients,
         ]);
+    }
+
+    private function generateNumeroCompte(): string
+    {
+        $digits = '';
+        for ($i = 0; $i < 24; ++$i) {
+            $digits .= (string) random_int(0, 9);
+        }
+
+        return 'FR'.$digits;
     }
 }

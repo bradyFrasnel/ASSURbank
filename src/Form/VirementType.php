@@ -5,48 +5,46 @@ namespace App\Form;
 use App\Entity\Compte;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VirementType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var list<Compte> $comptes */
+        $comptes = $options['comptes'];
+
         $builder
             ->add('compteSource', EntityType::class, [
                 'class' => Compte::class,
-                'choice_label' => 'numeroCompte',
+                'choices' => $comptes,
+                'choice_label' => fn (Compte $c) => sprintf('%s — %.2f FCFA', $c->getNumeroCompte(), $c->getSolde()),
                 'label' => 'Compte source',
-                'attr' => ['class' => 'form-control']
             ])
             ->add('compteDestination', EntityType::class, [
                 'class' => Compte::class,
-                'choice_label' => 'numeroCompte',
+                'choices' => $comptes,
+                'choice_label' => fn (Compte $c) => sprintf('%s — %.2f FCFA', $c->getNumeroCompte(), $c->getSolde()),
                 'label' => 'Compte destination',
-                'attr' => ['class' => 'form-control']
             ])
-            ->add('montant', NumberType::class, [
+            ->add('montant', MoneyType::class, [
                 'label' => 'Montant',
-                'scale' => 2,
-                'attr' => [
-                    'class' => 'form-control',
-                    'step' => '0.01',
-                    'min' => '0.01'
-                ]
+                'currency' => 'XAF',
+                'constraints' => [new NotBlank(), new GreaterThan(0)],
             ])
-            ->add('libelle', TextType::class, [
-                'label' => 'Libellé',
-                'attr' => ['class' => 'form-control']
-            ])
-        ;
+            ->add('libelle', TextType::class, ['label' => 'Libellé']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            // Configure your form options here
+            'comptes' => [],
         ]);
+        $resolver->setAllowedTypes('comptes', 'array');
     }
 }

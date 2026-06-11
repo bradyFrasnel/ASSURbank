@@ -3,107 +3,112 @@
 {% block title %}Dashboard Client{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Bienvenue, {{ client.prenom }} {{ client.nom }}</h1>
-            <p>Email: {{ client.email }}</p>
-        </div>
+<div class="container py-4">
+    <div class="page-header">
+        <h1 class="h3 fw-bold mb-1">Bonjour, {{ client.prenom }} {{ client.nom }}</h1>
+        <p class="text-muted mb-0">
+            <i class="bi bi-bank me-1"></i>{{ client.banque ? client.banque.nom : 'Banque non assignée' }}
+        </p>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Mes Comptes</h4>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="table-card card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold">Mes Comptes</h5>
+                    <a href="{{ path('app_client_comptes') }}" class="btn btn-sm btn-outline-primary">Voir tout</a>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if comptes is empty %}
-                        <p>Aucun compte disponible.</p>
+                        <div class="text-center py-4 text-muted">Aucun compte disponible.</div>
                     {% else %}
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Numéro</th>
-                                    <th>Type</th>
-                                    <th>Solde (FCFA)</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for compte in comptes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ compte.numeroCompte }}</td>
-                                        <td>{{ compte.type }}</td>
-                                        <td>{{ compte.solde|number_format(2, ',', ' ') }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ compte.statut == 'actif' ? 'success' : 'danger' }}">
-                                                {{ compte.statut }}
-                                            </span>
-                                        </td>
+                                        <th class="ps-4">Numéro</th>
+                                        <th>Type</th>
+                                        <th>Solde</th>
+                                        <th class="pe-4">Statut</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for compte in comptes %}
+                                        <tr>
+                                            <td class="ps-4"><code class="small">{{ compte.numeroCompte|slice(0, 12) }}…</code></td>
+                                            <td class="text-capitalize">{{ compte.type }}</td>
+                                            <td class="fw-semibold">{{ compte.solde|number_format(2, ',', ' ') }} FCFA</td>
+                                            <td class="pe-4">
+                                                <span class="badge badge-statut-{{ compte.statut }}">{{ compte.statut }}</span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Dernières Transactions</h4>
+        <div class="col-lg-6">
+            <div class="table-card card">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Dernières Transactions</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if transactions is empty %}
-                        <p>Aucune transaction récente.</p>
+                        <div class="text-center py-4 text-muted">Aucune transaction récente.</div>
                     {% else %}
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Montant</th>
-                                    <th>Libellé</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for transaction in transactions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td>{{ transaction.dateTransaction|date('d/m/Y H:i') }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ transaction.type == 'crédit' ? 'success' : 'danger' }}">
-                                                {{ transaction.type }}
-                                            </span>
-                                        </td>
-                                        <td>{{ transaction.montant|number_format(2, ',', ' ') }}</td>
-                                        <td>{{ transaction.libelle }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ transaction.statut == 'succès' ? 'success' : 'danger' }}">
-                                                {{ transaction.statut }}
-                                            </span>
-                                        </td>
+                                        <th class="ps-4">Date</th>
+                                        <th>Type</th>
+                                        <th>Montant</th>
+                                        <th class="pe-4">Statut</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions %}
+                                        <tr>
+                                            <td class="ps-4 small">{{ transaction.dateTransaction|date('d/m/Y H:i') }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ transaction.type == 'crédit' ? 'success' : 'danger' }}">
+                                                    {{ transaction.type }}
+                                                </span>
+                                            </td>
+                                            <td class="fw-semibold">{{ transaction.montant|number_format(2, ',', ' ') }}</td>
+                                            <td class="pe-4">
+                                                <span class="badge bg-{{ transaction.statut == 'succès' ? 'success' : 'danger' }}">
+                                                    {{ transaction.statut }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="btn-group">
-                <a href="{{ path('app_client_comptes') }}" class="btn btn-primary">Voir mes comptes</a>
-                <a href="{{ path('app_client_virement') }}" class="btn btn-success">Effectuer un virement</a>
-                <a href="{{ path('app_client_profil') }}" class="btn btn-info">Mon profil</a>
-                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-            </div>
-        </div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <a href="{{ path('app_client_comptes') }}" class="btn btn-primary btn-portal">
+            <i class="bi bi-wallet2 me-1"></i> Mes comptes
+        </a>
+        <a href="{{ path('app_client_virement') }}" class="btn btn-success btn-portal">
+            <i class="bi bi-arrow-left-right me-1"></i> Effectuer un virement
+        </a>
+        <a href="{{ path('app_client_transactions') }}" class="btn btn-outline-primary btn-portal">
+            <i class="bi bi-clock-history me-1"></i> Historique
+        </a>
+        <a href="{{ path('app_client_profil') }}" class="btn btn-outline-secondary btn-portal">
+            <i class="bi bi-person me-1"></i> Mon profil
+        </a>
     </div>
 </div>
 {% endblock %}

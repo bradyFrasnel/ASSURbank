@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compte {{ compte.numeroCompte }}{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Détail du compte</h1>
+            <p class="text-muted mb-0"><code>{{ compte.numeroCompte }}</code></p>
+        </div>
+        <a href="{{ path('app_client_comptes') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Retour
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Type</p>
+                <h4 class="text-capitalize mb-0">{{ compte.type }}</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Solde</p>
+                <h4 class="text-primary mb-0">{{ compte.solde|number_format(2, ',', ' ') }} FCFA</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Statut</p>
+                <span class="badge badge-statut-{{ compte.statut }} fs-6">{{ compte.statut }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card card">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Historique des transactions</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if transactions is empty %}
+                <div class="text-center py-4 text-muted">Aucune transaction enregistrée.</div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Type</th>
+                                <th>Montant</th>
+                                <th>Libellé</th>
+                                <th class="pe-4">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td class="ps-4">{{ transaction.dateTransaction|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ transaction.type == 'crédit' ? 'success' : 'danger' }}">
+                                            {{ transaction.type }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ transaction.montant|number_format(2, ',', ' ') }} FCFA</td>
+                                    <td>{{ transaction.libelle }}</td>
+                                    <td class="pe-4">
+                                        <span class="badge bg-{{ transaction.statut == 'succès' ? 'success' : 'danger' }}">
+                                            {{ transaction.statut }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'components/pagination.html.twig' with {
+        pagination: pagination,
+        route: 'app_client_compte_show',
+        query_params: {id: compte.id}
+    } %}
+</div>
+{% endblock %}

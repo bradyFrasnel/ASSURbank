@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un Compte{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="page-header">
+                <h1 class="h3 fw-bold mb-1">Créer un compte bancaire</h1>
+            </div>
+
+            <div class="auth-card card">
+                <div class="card-body p-4">
+                    {% if clients is empty %}
+                        <div class="alert alert-warning">Aucun client actif disponible.</div>
+                    {% else %}
+                        {{ form_start(form) }}
+                            {{ form_row(form.client) }}
+                            {{ form_row(form.type) }}
+                            <button type="submit" class="btn btn-success btn-portal w-100 py-2">
+                                <i class="bi bi-check-circle me-1"></i> Créer le compte
+                            </button>
+                        {{ form_end(form) }}
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="{{ path('app_banque_clients') }}" class="text-muted small text-decoration-none">
+                            <i class="bi bi-arrow-left me-1"></i> Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,113 +1,117 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ASSURbank - Banque en Ligne{% endblock %}
+{% block title %}ASSURbank — Banque en ligne{% endblock %}
 
 {% block body %}
-<div class="container-fluid p-0">
-    <!-- Hero Section -->
-    <div class="bg-primary text-white text-center py-5">
-        <div class="container">
-            <h1 class="display-4 fw-bold">ASSURbank</h1>
-            <p class="lead">Votre banque en ligne sécurisée et fiable</p>
-            <p class="mb-4">Gérez vos comptes, effectuez des virements et suivez vos transactions en toute simplicité</p>
-            <div class="mt-4">
-                {% if app.user %}
-                    <a href="{{ path('app_client_dashboard') }}" class="btn btn-light btn-lg me-2">Mon Dashboard</a>
-                {% else %}
-                    <a href="{{ path('app_client_inscription') }}" class="btn btn-light btn-lg me-2">S'inscrire</a>
-                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg">Se connecter</a>
-                {% endif %}
-            </div>
-        </div>
+<section class="hero-section text-center">
+    <div class="container">
+        <h1 class="hero-title mb-3">Bienvenue sur <span class="hero-accent">ASSURbank</span></h1>
+        <p class="lead mb-0 opacity-90">Votre plateforme bancaire multi-banques — simple, sécurisée et accessible</p>
     </div>
+</section>
 
-    <!-- Features Section -->
-    <div class="container py-5">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-shield-lock" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="card-title">Sécurité Maximale</h5>
-                        <p class="card-text">Vos données et transactions sont protégées par les standards de sécurité les plus élevés.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-lightning" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="card-title">Virements Instantanés</h5>
-                        <p class="card-text">Effectuez des virements entre vos comptes en temps réel et sans frais.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <i class="bi bi-graph-up" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="card-title">Suivi en Temps Réel</h5>
-                        <p class="card-text">Consultez l'historique de vos transactions et suivez l'évolution de vos comptes.</p>
-                    </div>
-                </div>
-            </div>
+<section class="portal-section pb-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Choisissez votre espace</h2>
+            <p class="text-muted">Connectez-vous ou créez un compte selon votre profil</p>
         </div>
-    </div>
 
-    <!-- Services Section -->
-    <div class="bg-light py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Nos Services</h2>
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Pour les Clients</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">✓ Gestion de comptes multiples</li>
-                                <li class="mb-2">✓ Virements internes gratuits</li>
-                                <li class="mb-2">✓ Historique des transactions</li>
-                                <li class="mb-2">✓ Consultation des soldes en temps réel</li>
-                            </ul>
+        <div class="row g-4 justify-content-center">
+            {# Espace Client #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card portal-card h-100">
+                    <div class="card-header-bar bg-primary"></div>
+                    <div class="card-body text-center p-4">
+                        <div class="portal-icon portal-icon-client">
+                            <i class="bi bi-person-circle"></i>
                         </div>
+                        <h4 class="fw-bold">Espace Client</h4>
+                        <p class="text-muted small">Consultez vos comptes, effectuez des virements et suivez vos transactions.</p>
+                        <a href="{{ path('app_login_client') }}" class="btn btn-primary btn-portal w-100 mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                        </a>
+                        <a href="{{ path('app_client_inscription') }}" class="btn btn-outline-primary btn-portal w-100">
+                            <i class="bi bi-person-plus me-1"></i> Créer un compte
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Pour les Banques</h5>
-                            <ul class="list-unstyled">
-                                <li class="mb-2">✓ Gestion des clients</li>
-                                <li class="mb-2">✓ Création et activation de comptes</li>
-                                <li class="mb-2">✓ Statistiques et rapports</li>
-                                <li class="mb-2">✓ Suivi des transactions</li>
-                            </ul>
+            </div>
+
+            {# Espace Banque #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card portal-card h-100">
+                    <div class="card-header-bar bg-success"></div>
+                    <div class="card-body text-center p-4">
+                        <div class="portal-icon portal-icon-banque">
+                            <i class="bi bi-bank"></i>
                         </div>
+                        <h4 class="fw-bold">Espace Banque</h4>
+                        <p class="text-muted small">Gérez vos clients, créez des comptes et supervisez les opérations.</p>
+                        <a href="{{ path('app_login_banque') }}" class="btn btn-success btn-portal w-100 mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                        </a>
+                        <a href="{{ path('app_banque_inscription') }}" class="btn btn-outline-success btn-portal w-100">
+                            <i class="bi bi-building-add me-1"></i> Inscrire ma banque
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {# Espace Admin #}
+            <div class="col-md-6 col-lg-4">
+                <div class="card portal-card h-100">
+                    <div class="card-header-bar bg-danger"></div>
+                    <div class="card-body text-center p-4">
+                        <div class="portal-icon portal-icon-admin">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <h4 class="fw-bold">Administration</h4>
+                        <p class="text-muted small">Supervision globale de la plateforme et des banques partenaires.</p>
+                        <a href="{{ path('app_login_admin') }}" class="btn btn-danger btn-portal w-100 mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                        </a>
+                        <p class="text-muted small mt-3 mb-0">
+                            <i class="bi bi-info-circle me-1"></i> Compte administrateur prédéfini
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Contact Section -->
-    <div class="container py-5 text-center">
-        <h2 class="mb-4">Besoin d'aide ?</h2>
-        <p class="lead mb-4">Notre équipe est à votre disposition pour répondre à toutes vos questions.</p>
-        <a href="#" class="btn btn-primary btn-lg">Nous Contacter</a>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2026 ASSURbank. Tous droits réservés.</p>
-            <p class="mb-0 text-muted">Devise: FCFA | Sécurisé par Symfony 8</p>
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card p-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-check feature-icon mb-3 d-block"></i>
+                        <h5 class="fw-bold">Sécurité maximale</h5>
+                        <p class="text-muted small mb-0">Authentification sécurisée, chiffrement Argon2 et protection CSRF.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightning-charge feature-icon mb-3 d-block"></i>
+                        <h5 class="fw-bold">Virements internes</h5>
+                        <p class="text-muted small mb-0">Transférez des fonds entre vos comptes en toute simplicité.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card p-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-graph-up-arrow feature-icon mb-3 d-block"></i>
+                        <h5 class="fw-bold">Suivi en temps réel</h5>
+                        <p class="text-muted small mb-0">Historique complet de vos transactions et soldes actualisés.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
-</div>
+    </div>
+</section>
 {% endblock %}

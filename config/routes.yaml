@@ -11,9 +11,30 @@ app_home:
     path: /
     controller: App\Controller\HomeController::index
 
+app_login_redirect:
+    path: /login
+    controller: App\Controller\SecurityController::loginRedirect
+    methods: [GET]
+
 app_login:
     path: /login
-    controller: App\Controller\SecurityController::login
+    controller: App\Controller\SecurityController::loginCheck
+    methods: [POST]
+
+app_login_client:
+    path: /login/client
+    controller: App\Controller\SecurityController::loginClient
+    methods: [GET]
+
+app_login_banque:
+    path: /login/banque
+    controller: App\Controller\SecurityController::loginBanque
+    methods: [GET]
+
+app_login_admin:
+    path: /login/admin
+    controller: App\Controller\SecurityController::loginAdmin
+    methods: [GET]
 
 app_logout:
     path: /logout
@@ -22,6 +43,26 @@ app_logout:
 app_admin_dashboard:
     path: /admin
     controller: App\Controller\Admin\AdminDashboardController::index
+
+app_admin_banque_activer:
+    path: /admin/banque/{id}/activer
+    controller: App\Controller\Admin\AdminDashboardController::activerBanque
+    methods: [POST]
+
+app_admin_banque_desactiver:
+    path: /admin/banque/{id}/desactiver
+    controller: App\Controller\Admin\AdminDashboardController::desactiverBanque
+    methods: [POST]
+
+app_client_transactions:
+    path: /client/transactions
+    controller: App\Controller\ClientController::transactions
+    methods: [GET]
+
+app_banque_inscription:
+    path: /banque/inscription
+    controller: App\Controller\BanqueController::inscription
+    methods: [GET, POST]
 
 app_client_inscription:
     path: /client/inscription

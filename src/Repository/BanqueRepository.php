@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\PaginatedResult;
 use App\Entity\Banque;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +17,31 @@ class BanqueRepository extends ServiceEntityRepository
         parent::__construct($registry, Banque::class);
     }
 
-    //    /**
-    //     * @return Banque[] Returns an array of Banque objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return PaginatedResult<Banque>
+     */
+    public function findPaginated(int $page = 1, int $perPage = 10): PaginatedResult
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->orderBy('b.dateCreation', 'DESC');
 
-    //    public function findOneBySomeField($value): ?Banque
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $total = (int) (clone $qb)
+            ->select('COUNT(b.id)')
+            ->resetDQLPart('orderBy')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $items = $qb
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage)
+            ->getQuery()
+            ->getResult();
+
+        return new PaginatedResult($items, $total, $page, $perPage);
+    }
+
+    public function countByStatut(string $statut): int
+    {
+        return (int) $this->count(['statut' => $statut]);
+    }
 }

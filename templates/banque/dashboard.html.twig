@@ -3,102 +3,83 @@
 {% block title %}Dashboard Banque{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Dashboard - {{ banque.nom }}</h1>
-            <p>Email: {{ banque.email }}</p>
-        </div>
+<div class="container py-4">
+    <div class="page-header">
+        <h1 class="h3 fw-bold mb-1">{{ banque.nom }}</h1>
+        <p class="text-muted mb-0">{{ banque.email }}</p>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Clients</h5>
-                    <h2 class="text-primary">{{ totalClients }}</h2>
-                </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Clients</p>
+                <h3 class="text-primary mb-0">{{ totalClients }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Comptes</h5>
-                    <h2 class="text-success">{{ totalComptes }}</h2>
-                </div>
+        <div class="col-md-3 col-6">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Comptes</p>
+                <h3 class="text-success mb-0">{{ totalComptes }}</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Montant Total</h5>
-                    <h2 class="text-info">{{ montantTotal|number_format(2, ',', ' ') }} FCFA</h2>
-                </div>
+        <div class="col-md-3 col-6">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Montant géré</p>
+                <h3 class="text-info mb-0 fs-5">{{ montantTotal|number_format(0, ',', ' ') }} FCFA</h3>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Statut</h5>
-                    <h2 class="text-{{ banque.statut == 'actif' ? 'success' : 'danger' }}">{{ banque.statut }}</h2>
-                </div>
+        <div class="col-md-3 col-6">
+            <div class="dashboard-stat card text-center p-3">
+                <p class="text-muted small mb-1">Statut</p>
+                <span class="badge badge-statut-{{ banque.statut }} fs-6">{{ banque.statut }}</span>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Mes Clients</h4>
-                </div>
-                <div class="card-body">
-                    {% if clients is empty %}
-                        <p>Aucun client enregistré.</p>
-                    {% else %}
-                        <table class="table">
-                            <thead>
+    <div class="table-card card">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 fw-bold">Clients récents</h5>
+            <a href="{{ path('app_banque_clients') }}" class="btn btn-sm btn-outline-primary">Tous les clients</a>
+        </div>
+        <div class="card-body p-0">
+            {% if clients is empty %}
+                <div class="text-center py-4 text-muted">Aucun client enregistré.</div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Nom</th>
+                                <th>Email</th>
+                                <th>Statut</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients|slice(0, 5) %}
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Prénom</th>
-                                    <th>Email</th>
-                                    <th>Téléphone</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
+                                    <td class="ps-4 fw-semibold">{{ client.prenom }} {{ client.nom }}</td>
+                                    <td>{{ client.email }}</td>
+                                    <td><span class="badge badge-statut-{{ client.statut }}">{{ client.statut }}</span></td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ path('app_banque_client_show', {id: client.id}) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for client in clients %}
-                                    <tr>
-                                        <td>{{ client.nom }}</td>
-                                        <td>{{ client.prenom }}</td>
-                                        <td>{{ client.email }}</td>
-                                        <td>{{ client.telephone }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ client.statut == 'actif' ? 'success' : 'danger' }}">
-                                                {{ client.statut }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a href="{{ path('app_banque_client_show', {'id': client.id}) }}" class="btn btn-sm btn-info">Voir</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="btn-group">
-                <a href="{{ path('app_banque_clients') }}" class="btn btn-primary">Gérer les clients</a>
-                <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-            </div>
-        </div>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <a href="{{ path('app_banque_clients') }}" class="btn btn-primary btn-portal">
+            <i class="bi bi-people me-1"></i> Gérer les clients
+        </a>
+        <a href="{{ path('app_banque_compte_create') }}" class="btn btn-success btn-portal">
+            <i class="bi bi-plus-circle me-1"></i> Créer un compte
+        </a>
     </div>
 </div>
 {% endblock %}

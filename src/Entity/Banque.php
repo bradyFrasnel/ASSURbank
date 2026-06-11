@@ -6,9 +6,12 @@ use App\Repository\BanqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: BanqueRepository::class)]
-class Banque
+#[ORM\UniqueConstraint(name: 'UNIQ_BANQUE_EMAIL', fields: ['email'])]
+class Banque implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -76,6 +79,22 @@ class Banque
         return $this;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRoles(): array
+    {
+        $roles = [$this->role ?? 'ROLE_BANQUE'];
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
@@ -86,6 +105,14 @@ class Banque
         $this->password = $password;
 
         return $this;
+    }
+
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password ?? '');
+
+        return $data;
     }
 
     public function getTelephone(): ?string

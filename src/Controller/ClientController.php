@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\Banque;
 use App\Entity\Client;
 use App\Entity\Compte;
-use App\Entity\Transaction;
+use App\Form\ChangePasswordType;
+use App\Form\ClientInscriptionType;
+use App\Form\TransactionFilterType;
+use App\Form\VirementType;
 use App\Repository\BanqueRepository;
 use App\Repository\CompteRepository;
 use App\Repository\TransactionRepository;
@@ -26,46 +28,33 @@ class ClientController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager,
-        BanqueRepository $banqueRepository
+        BanqueRepository $banqueRepository,
     ): Response {
-        if ($this->getUser()) {
+        if ($this->isGranted('ROLE_CLIENT')) {
             return $this->redirectToRoute('app_client_dashboard');
         }
 
-        if ($request->isMethod('POST')) {
-            $client = new Client();
-            $client->setNom($request->request->get('nom'));
-            $client->setPrenom($request->request->get('prenom'));
-            $client->setEmail($request->request->get('email'));
-            $client->setTelephone($request->request->get('telephone'));
+        $client = new Client();
+        $form = $this->createForm(ClientInscriptionType::class, $client);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $client->setRole('ROLE_CLIENT');
             $client->setStatut('actif');
             $client->setDateCreation(new \DateTimeImmutable());
-
-            // Mot de passe
-            $password = $request->request->get('password');
-            $hashedPassword = $passwordHasher->hashPassword($client, $password);
-            $client->setPassword($hashedPassword);
-
-            // Sélection de la banque
-            $banqueId = $request->request->get('banque_id');
-            if ($banqueId) {
-                $banque = $banqueRepository->find($banqueId);
-                if ($banque) {
-                    $client->setBanque($banque);
-                }
-            }
+            $client->setPassword($passwordHasher->hashPassword($client, $form->get('plainPassword')->getData()));
 
             $entityManager->persist($client);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_login');
+            $this->addFlash('success', 'Inscription réussie. Vous pouvez maintenant vous connecter.');
+
+            return $this->redirectToRoute('app_login_client');
         }
 
-        $banques = $banqueRepository->findBy(['statut' => 'actif']);
-
         return $this->render('client/inscription.html.twig', [
-            'banques' => $banques,
+            'form' => $form,
+            'banques' => $banqueRepository->findBy(['statut' => 'actif']),
         ]);
     }
 
@@ -73,33 +62,17 @@ class ClientController extends AbstractController
     #[IsGranted('ROLE_CLIENT')]
     public function dashboard(
         CompteRepository $compteRepository,
-        TransactionRepository $transactionRepository
+        TransactionRepository $transactionRepository,
     ): Response {
         /** @var Client $client */
         $client = $this->getUser();
-
         $comptes = $compteRepository->findBy(['client' => $client]);
-        
-        // Récupérer les transactions récentes
-        $transactions = [];
-        foreach ($comptes as $compte) {
-            $compteTransactions = $transactionRepository->findBy(
-                ['compteSource' => $compte],
-                ['dateTransaction' => 'DESC'],
-                10
-            );
-            $transactions = array_merge($transactions, $compteTransactions);
-        }
-
-        // Trier par date
-        usort($transactions, function($a, $b) {
-            return $b->getDateTransaction() <=> $a->getDateTransaction();
-        });
+        $pagination = $transactionRepository->findByClientPaginated($client, 1, 5);
 
         return $this->render('client/dashboard.html.twig', [
             'client' => $client,
             'comptes' => $comptes,
-            'transactions' => array_slice($transactions, 0, 10),
+            'transactions' => $pagination->items,
         ]);
     }
 
@@ -109,36 +82,67 @@ class ClientController extends AbstractController
     {
         /** @var Client $client */
         $client = $this->getUser();
-        $comptes = $compteRepository->findBy(['client' => $client]);
 
         return $this->render('client/comptes.html.twig', [
-            'comptes' => $comptes,
+            'comptes' => $compteRepository->findBy(['client' => $client]),
         ]);
     }
 
     #[Route('/compte/{id}', name: 'app_client_compte_show', methods: ['GET'])]
     #[IsGranted('ROLE_CLIENT')]
     public function showCompte(
+        Request $request,
         Compte $compte,
         TransactionRepository $transactionRepository,
-        CompteRepository $compteRepository
     ): Response {
         /** @var Client $client */
         $client = $this->getUser();
 
-        // Vérifier que le compte appartient au client
         if ($compte->getClient() !== $client) {
             throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
         }
 
-        $transactions = $transactionRepository->findBy(
-            ['compteSource' => $compte],
-            ['dateTransaction' => 'DESC']
-        );
+        $page = max(1, $request->query->getInt('page', 1));
+        $pagination = $transactionRepository->findByComptePaginated($compte, $page, 10);
 
         return $this->render('client/compte_show.html.twig', [
             'compte' => $compte,
-            'transactions' => $transactions,
+            'pagination' => $pagination,
+            'transactions' => $pagination->items,
+        ]);
+    }
+
+    #[Route('/transactions', name: 'app_client_transactions', methods: ['GET'])]
+    #[IsGranted('ROLE_CLIENT')]
+    public function transactions(Request $request, TransactionRepository $transactionRepository): Response
+    {
+        /** @var Client $client */
+        $client = $this->getUser();
+
+        $filterForm = $this->createForm(TransactionFilterType::class);
+        $filterForm->handleRequest($request);
+
+        $filters = $filterForm->isSubmitted() ? $filterForm->getData() : [];
+        $filters = array_filter($filters ?? [], fn ($v) => $v !== null && $v !== '');
+
+        if (isset($filters['date_debut']) && $filters['date_debut'] instanceof \DateTimeInterface) {
+            $filters['date_debut'] = $filters['date_debut']->format('Y-m-d');
+        }
+        if (isset($filters['date_fin']) && $filters['date_fin'] instanceof \DateTimeInterface) {
+            $filters['date_fin'] = $filters['date_fin']->format('Y-m-d');
+        }
+
+        $page = max(1, $request->query->getInt('page', 1));
+        $pagination = $transactionRepository->findByClientPaginated($client, $page, 10, $filters);
+
+        $queryParams = $request->query->all();
+        unset($queryParams['page']);
+
+        return $this->render('client/transactions.html.twig', [
+            'filterForm' => $filterForm,
+            'pagination' => $pagination,
+            'transactions' => $pagination->items,
+            'query_params' => $queryParams,
         ]);
     }
 
@@ -148,29 +152,25 @@ class ClientController extends AbstractController
         Request $request,
         VirementService $virementService,
         CompteRepository $compteRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         /** @var Client $client */
         $client = $this->getUser();
         $comptes = $compteRepository->findBy(['client' => $client, 'statut' => 'actif']);
 
+        $form = $this->createForm(VirementType::class, null, ['comptes' => $comptes]);
+        $form->handleRequest($request);
+
         $error = null;
         $success = null;
 
-        if ($request->isMethod('POST')) {
-            $compteSourceId = $request->request->get('compte_source');
-            $compteDestinationId = $request->request->get('compte_destination');
-            $montant = (float) $request->request->get('montant');
-            $libelle = $request->request->get('libelle');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $compteSource = $form->get('compteSource')->getData();
+            $compteDestination = $form->get('compteDestination')->getData();
+            $montant = (float) $form->get('montant')->getData();
+            $libelle = $form->get('libelle')->getData();
 
-            $compteSource = $compteRepository->find($compteSourceId);
-            $compteDestination = $compteRepository->find($compteDestinationId);
-
-            if (!$compteSource || !$compteDestination) {
-                $error = 'Comptes invalides.';
-            } elseif ($compteSource->getClient() !== $client) {
-                $error = 'Le compte source ne vous appartient pas.';
-            } elseif ($compteSource === $compteDestination) {
+            if ($compteSource === $compteDestination) {
                 $error = 'Impossible de virer vers le même compte.';
             } else {
                 try {
@@ -178,6 +178,7 @@ class ClientController extends AbstractController
                     $success = 'Virement effectué avec succès.';
                     $entityManager->refresh($compteSource);
                     $entityManager->refresh($compteDestination);
+                    $form = $this->createForm(VirementType::class, null, ['comptes' => $comptes]);
                 } catch (\Exception $e) {
                     $error = $e->getMessage();
                 }
@@ -185,6 +186,7 @@ class ClientController extends AbstractController
         }
 
         return $this->render('client/virement.html.twig', [
+            'form' => $form,
             'comptes' => $comptes,
             'error' => $error,
             'success' => $success,
@@ -196,25 +198,25 @@ class ClientController extends AbstractController
     public function profil(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
     ): Response {
         /** @var Client $client */
         $client = $this->getUser();
-        $success = null;
 
-        if ($request->isMethod('POST')) {
-            $nouveauMotDePasse = $request->request->get('nouveau_mot_de_passe');
-            if ($nouveauMotDePasse) {
-                $hashedPassword = $passwordHasher->hashPassword($client, $nouveauMotDePasse);
-                $client->setPassword($hashedPassword);
-                $entityManager->flush();
-                $success = 'Mot de passe modifié avec succès.';
-            }
+        $form = $this->createForm(ChangePasswordType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $client->setPassword($passwordHasher->hashPassword($client, $form->get('plainPassword')->getData()));
+            $entityManager->flush();
+            $this->addFlash('success', 'Mot de passe modifié avec succès.');
+
+            return $this->redirectToRoute('app_client_profil');
         }
 
         return $this->render('client/profil.html.twig', [
             'client' => $client,
-            'success' => $success,
+            'form' => $form,
         ]);
     }
 }

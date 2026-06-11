@@ -3,65 +3,37 @@
 {% block title %}Virement{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="text-center">Effectuer un Virement</h4>
-                </div>
-                <div class="card-body">
-                    {% if error %}
-                        <div class="alert alert-danger">
-                            {{ error }}
-                        </div>
-                    {% endif %}
+            <div class="page-header text-center">
+                <h1 class="h3 fw-bold">Effectuer un virement</h1>
+            </div>
 
+            <div class="auth-card card">
+                <div class="card-body p-4">
+                    {% if error %}
+                        <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+                    {% endif %}
                     {% if success %}
-                        <div class="alert alert-success">
-                            {{ success }}
-                        </div>
+                        <div class="alert alert-success"><i class="bi bi-check-circle me-1"></i>{{ success }}</div>
                     {% endif %}
 
                     {% if comptes is empty %}
-                        <div class="alert alert-warning">
-                            Vous n'avez aucun compte actif pour effectuer un virement.
-                        </div>
-                        <a href="{{ path('app_client_dashboard') }}" class="btn btn-primary">Retour au dashboard</a>
+                        <div class="alert alert-warning">Aucun compte actif disponible.</div>
+                        <a href="{{ path('app_client_dashboard') }}" class="btn btn-primary">Retour</a>
                     {% else %}
-                        <form method="post">
-                            <div class="mb-3">
-                                <label for="compte_source" class="form-label">Compte source</label>
-                                <select class="form-select" id="compte_source" name="compte_source" required>
-                                    {% for compte in comptes %}
-                                        <option value="{{ compte.id }}">
-                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} FCFA
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="compte_destination" class="form-label">Compte destination</label>
-                                <select class="form-select" id="compte_destination" name="compte_destination" required>
-                                    {% for compte in comptes %}
-                                        <option value="{{ compte.id }}">
-                                            {{ compte.numeroCompte }} - Solde: {{ compte.solde|number_format(2, ',', ' ') }} FCFA
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="montant" class="form-label">Montant</label>
-                                <input type="number" class="form-control" id="montant" name="montant" step="0.01" min="0.01" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="libelle" class="form-label">Libellé</label>
-                                <input type="text" class="form-control" id="libelle" name="libelle" required>
-                            </div>
-                            <button type="submit" class="btn btn-success w-100">Effectuer le virement</button>
-                        </form>
+                        {{ form_start(form) }}
+                            {{ form_row(form.compteSource) }}
+                            {{ form_row(form.compteDestination) }}
+                            {{ form_row(form.montant) }}
+                            {{ form_row(form.libelle) }}
+                            <button type="submit" class="btn btn-success btn-portal w-100 py-2">
+                                <i class="bi bi-arrow-left-right me-1"></i> Effectuer le virement
+                            </button>
+                        {{ form_end(form) }}
                         <div class="text-center mt-3">
-                            <a href="{{ path('app_client_dashboard') }}" class="btn btn-secondary">Annuler</a>
+                            <a href="{{ path('app_client_dashboard') }}" class="btn btn-outline-secondary btn-sm">Annuler</a>
                         </div>
                     {% endif %}
                 </div>

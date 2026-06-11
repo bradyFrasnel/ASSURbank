@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription Banque{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="auth-card card">
+                <div class="auth-card-header success">
+                    <i class="bi bi-building-add auth-icon"></i>
+                    <h3 class="mb-1">Inscription Banque</h3>
+                    <p class="mb-0 opacity-75 small">Créez l'espace de votre établissement</p>
+                </div>
+                <div class="card-body p-4">
+                    {{ form_start(form) }}
+                        {{ form_row(form.nom) }}
+                        {{ form_row(form.email) }}
+                        {{ form_row(form.telephone) }}
+                        {{ form_row(form.plainPassword) }}
+                        <button type="submit" class="btn btn-success btn-portal w-100 py-2 mt-2">
+                            <i class="bi bi-check-circle me-1"></i> Inscrire ma banque
+                        </button>
+                    {{ form_end(form) }}
+
+                    <hr class="my-3">
+                    <a href="{{ path('app_login_banque') }}" class="btn btn-outline-success w-100 btn-portal">Se connecter</a>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ path('app_home') }}" class="text-muted small text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à l'accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,50 +3,42 @@
 {% block title %}Inscription Client{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="text-center">Inscription Client</h4>
+        <div class="col-md-7 col-lg-6">
+            <div class="auth-card card">
+                <div class="auth-card-header primary">
+                    <i class="bi bi-person-plus auth-icon"></i>
+                    <h3 class="mb-1">Inscription Client</h3>
+                    <p class="mb-0 opacity-75 small">Créez votre compte et choisissez votre banque</p>
                 </div>
-                <div class="card-body">
-                    <form method="post">
-                        <div class="mb-3">
-                            <label for="nom" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="nom" name="nom" required>
+                <div class="card-body p-4">
+                    {% if banques is empty %}
+                        <div class="alert alert-warning">
+                            Aucune banque active disponible pour le moment.
                         </div>
-                        <div class="mb-3">
-                            <label for="prenom" class="form-label">Prénom</label>
-                            <input type="text" class="form-control" id="prenom" name="prenom" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="telephone" class="form-label">Téléphone</label>
-                            <input type="text" class="form-control" id="telephone" name="telephone">
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Mot de passe</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="banque_id" class="form-label">Banque</label>
-                            <select class="form-select" id="banque_id" name="banque_id" required>
-                                <option value="">Choisir une banque</option>
-                                {% for banque in banques %}
-                                    <option value="{{ banque.id }}">{{ banque.nom }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
-                    </form>
+                    {% else %}
+                        {{ form_start(form) }}
+                            {{ form_row(form.nom) }}
+                            {{ form_row(form.prenom) }}
+                            {{ form_row(form.email) }}
+                            {{ form_row(form.telephone) }}
+                            {{ form_row(form.plainPassword) }}
+                            {{ form_row(form.banque) }}
+                            <button type="submit" class="btn btn-primary btn-portal w-100 py-2 mt-2">
+                                <i class="bi bi-check-circle me-1"></i> S'inscrire
+                            </button>
+                        {{ form_end(form) }}
+                    {% endif %}
+
+                    <hr class="my-3">
+                    <a href="{{ path('app_login_client') }}" class="btn btn-outline-primary w-100 btn-portal">Se connecter</a>
                 </div>
             </div>
             <div class="text-center mt-3">
-                <a href="{{ path('app_login') }}">Déjà inscrit ? Connectez-vous</a>
+                <a href="{{ path('app_home') }}" class="text-muted small text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à l'accueil
+                </a>
             </div>
         </div>
     </div>

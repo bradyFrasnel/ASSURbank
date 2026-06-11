@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Comptes{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Mes Comptes</h1>
+            <p class="text-muted mb-0">Liste de tous vos comptes bancaires</p>
+        </div>
+        <a href="{{ path('app_client_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="table-card card">
+        <div class="card-body p-0">
+            {% if comptes is empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-wallet2 fs-1 d-block mb-2"></i>
+                    Aucun compte disponible pour le moment.
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Numéro</th>
+                                <th>Type</th>
+                                <th>Solde</th>
+                                <th>Statut</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for compte in comptes %}
+                                <tr>
+                                    <td class="ps-4"><code>{{ compte.numeroCompte }}</code></td>
+                                    <td><span class="text-capitalize">{{ compte.type }}</span></td>
+                                    <td class="fw-semibold">{{ compte.solde|number_format(2, ',', ' ') }} FCFA</td>
+                                    <td>
+                                        <span class="badge badge-statut-{{ compte.statut }}">{{ compte.statut }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ path('app_client_compte_show', {id: compte.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            Détails
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

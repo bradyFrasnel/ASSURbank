@@ -4,29 +4,96 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function loginRedirect(): Response
     {
-        // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
+        return $this->redirectToRoute('app_home');
+    }
 
-        // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        return $this->render('security/login.html.twig', [
-            'last_username' => $lastUsername,
-            'error' => $error,
+    public function loginClient(AuthenticationUtils $authenticationUtils): Response
+    {
+        return $this->renderLogin($authenticationUtils, [
+            'login_type' => 'client',
+            'required_role' => 'ROLE_CLIENT',
+            'dashboard_route' => 'app_client_dashboard',
+            'title' => 'Espace Client',
+            'subtitle' => 'Connectez-vous pour accéder à vos comptes et virements',
+            'icon' => 'bi-person-circle',
+            'color' => 'primary',
+            'inscription_route' => 'app_client_inscription',
+            'inscription_label' => 'Créer un compte client',
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    public function loginBanque(AuthenticationUtils $authenticationUtils): Response
+    {
+        return $this->renderLogin($authenticationUtils, [
+            'login_type' => 'banque',
+            'required_role' => 'ROLE_BANQUE',
+            'dashboard_route' => 'app_banque_dashboard',
+            'title' => 'Espace Banque',
+            'subtitle' => 'Connectez-vous pour gérer vos clients et leurs comptes',
+            'icon' => 'bi-bank',
+            'color' => 'success',
+            'inscription_route' => 'app_banque_inscription',
+            'inscription_label' => 'Inscrire une banque',
+        ]);
+    }
+
+    public function loginAdmin(AuthenticationUtils $authenticationUtils): Response
+    {
+        return $this->renderLogin($authenticationUtils, [
+            'login_type' => 'admin',
+            'required_role' => 'ROLE_ADMIN',
+            'dashboard_route' => 'app_admin_dashboard',
+            'title' => 'Espace Administrateur',
+            'subtitle' => 'Accès réservé à l\'administration de la plateforme',
+            'icon' => 'bi-shield-lock',
+            'color' => 'danger',
+            'inscription_route' => null,
+            'inscription_label' => null,
+        ]);
+    }
+
+    public function loginCheck(): never
+    {
+        throw new \LogicException('Cette route est interceptée par le firewall de sécurité.');
+    }
+
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException('Cette route est interceptée par le firewall de sécurité.');
+    }
+
+    /**
+     * @param array{
+     *     login_type: string,
+     *     required_role: string,
+     *     dashboard_route: string,
+     *     title: string,
+     *     subtitle: string,
+     *     icon: string,
+     *     color: string,
+     *     inscription_route: ?string,
+     *     inscription_label: ?string
+     * } $config
+     */
+    private function renderLogin(AuthenticationUtils $authenticationUtils, array $config): Response
+    {
+        if ($this->isGranted($config['required_role'])) {
+            return $this->redirectToRoute($config['dashboard_route']);
+        }
+
+        $wrongSession = $this->getUser() !== null;
+
+        return $this->render('security/login.html.twig', array_merge($config, [
+            'last_username' => $authenticationUtils->getLastUsername(),
+            'error' => $authenticationUtils->getLastAuthenticationError(),
+            'wrong_session' => $wrongSession,
+            'current_user_email' => $wrongSession ? $this->getUser()->getUserIdentifier() : null,
+        ]));
     }
 }

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Clients{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Gestion des Clients</h1>
+            <p class="text-muted mb-0">Liste de tous vos clients enregistrés</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_banque_compte_create') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Créer un compte
+            </a>
+            <a href="{{ path('app_banque_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="table-card card">
+        <div class="card-body p-0">
+            {% if clients is empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                    Aucun client enregistré pour le moment.
+                </div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                                <th>Statut</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in clients %}
+                                <tr>
+                                    <td class="ps-4 fw-semibold">{{ client.nom }}</td>
+                                    <td>{{ client.prenom }}</td>
+                                    <td>{{ client.email }}</td>
+                                    <td>{{ client.telephone }}</td>
+                                    <td>
+                                        <span class="badge badge-statut-{{ client.statut }}">{{ client.statut }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ path('app_banque_client_show', {id: client.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            Voir détails
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'components/pagination.html.twig' with {
+        pagination: pagination,
+        route: 'app_banque_clients',
+        query_params: {}
+    } %}
+</div>
+{% endblock %}

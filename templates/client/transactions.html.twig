@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des transactions{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Historique des transactions</h1>
+            <p class="text-muted mb-0">Recherchez et filtrez vos opérations</p>
+        </div>
+        <a href="{{ path('app_client_dashboard') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="auth-card card mb-4">
+        <div class="card-body p-4">
+            {{ form_start(filterForm, {attr: {class: 'row g-3 align-items-end'}}) }}
+                <div class="col-md-2">{{ form_row(filterForm.type) }}</div>
+                <div class="col-md-2">{{ form_row(filterForm.statut) }}</div>
+                <div class="col-md-3">{{ form_row(filterForm.libelle) }}</div>
+                <div class="col-md-2">{{ form_row(filterForm.date_debut) }}</div>
+                <div class="col-md-2">{{ form_row(filterForm.date_fin) }}</div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            {{ form_end(filterForm) }}
+        </div>
+    </div>
+
+    <div class="table-card card">
+        <div class="card-body p-0">
+            {% if transactions is empty %}
+                <div class="text-center py-5 text-muted">Aucune transaction trouvée.</div>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Date</th>
+                                <th>Type</th>
+                                <th>Montant</th>
+                                <th>Libellé</th>
+                                <th class="pe-4">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td class="ps-4">{{ transaction.dateTransaction|date('d/m/Y H:i') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ transaction.type == 'crédit' ? 'success' : 'danger' }}">
+                                            {{ transaction.type }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ transaction.montant|number_format(2, ',', ' ') }} FCFA</td>
+                                    <td>{{ transaction.libelle }}</td>
+                                    <td class="pe-4">
+                                        <span class="badge bg-{{ transaction.statut == 'succès' ? 'success' : 'danger' }}">
+                                            {{ transaction.statut }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'components/pagination.html.twig' with {
+        pagination: pagination,
+        route: 'app_client_transactions',
+        query_params: query_params
+    } %}
+</div>
+{% endblock %}

@@ -47,7 +47,7 @@ class AppFixtures extends Fixture
         $banque->setDateCreation($dateNow);
         $banque->setRole('ROLE_BANQUE');
 
-        $hashedPasswordBanque = $this->passwordHasher->hashPassword($admin, 'Banque123!');
+        $hashedPasswordBanque = $this->passwordHasher->hashPassword($banque, 'Banque123!');
         $banque->setPassword($hashedPasswordBanque);
 
         $manager->persist($banque);
