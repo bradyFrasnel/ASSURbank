@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "symfony-ux": {
+      "source": "smnandre/symfony-ux-skills",
+      "sourceType": "github",
+      "skillPath": "skills/symfony-ux/SKILL.md",
+      "computedHash": "e83fb38a33c8db87150aa2bd7f962275910aad1323359f5424d0dc41bca80aa3"
+    }
+  }
+}

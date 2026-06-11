@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ASSURbank - Banque en Ligne{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-0">
+    <!-- Hero Section -->
+    <div class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1 class="display-4 fw-bold">ASSURbank</h1>
+            <p class="lead">Votre banque en ligne sécurisée et fiable</p>
+            <p class="mb-4">Gérez vos comptes, effectuez des virements et suivez vos transactions en toute simplicité</p>
+            <div class="mt-4">
+                {% if app.user %}
+                    <a href="{{ path('app_client_dashboard') }}" class="btn btn-light btn-lg me-2">Mon Dashboard</a>
+                {% else %}
+                    <a href="{{ path('app_client_inscription') }}" class="btn btn-light btn-lg me-2">S'inscrire</a>
+                    <a href="{{ path('app_login') }}" class="btn btn-outline-light btn-lg">Se connecter</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-shield-lock" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Sécurité Maximale</h5>
+                        <p class="card-text">Vos données et transactions sont protégées par les standards de sécurité les plus élevés.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-lightning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Virements Instantanés</h5>
+                        <p class="card-text">Effectuez des virements entre vos comptes en temps réel et sans frais.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="bi bi-graph-up" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="card-title">Suivi en Temps Réel</h5>
+                        <p class="card-text">Consultez l'historique de vos transactions et suivez l'évolution de vos comptes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Section -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Nos Services</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pour les Clients</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">✓ Gestion de comptes multiples</li>
+                                <li class="mb-2">✓ Virements internes gratuits</li>
+                                <li class="mb-2">✓ Historique des transactions</li>
+                                <li class="mb-2">✓ Consultation des soldes en temps réel</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pour les Banques</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">✓ Gestion des clients</li>
+                                <li class="mb-2">✓ Création et activation de comptes</li>
+                                <li class="mb-2">✓ Statistiques et rapports</li>
+                                <li class="mb-2">✓ Suivi des transactions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="container py-5 text-center">
+        <h2 class="mb-4">Besoin d'aide ?</h2>
+        <p class="lead mb-4">Notre équipe est à votre disposition pour répondre à toutes vos questions.</p>
+        <a href="#" class="btn btn-primary btn-lg">Nous Contacter</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2026 ASSURbank. Tous droits réservés.</p>
+            <p class="mb-0 text-muted">Devise: FCFA | Sécurisé par Symfony 8</p>
+        </div>
+    </footer>
+</div>
+{% endblock %}

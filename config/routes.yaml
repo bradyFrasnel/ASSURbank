@@ -7,5 +7,88 @@
 # To list all registered routes, run the following command:
 #   bin/console debug:router
 
-controllers:
-    resource: routing.controllers
+app_home:
+    path: /
+    controller: App\Controller\HomeController::index
+
+app_login:
+    path: /login
+    controller: App\Controller\SecurityController::login
+
+app_logout:
+    path: /logout
+    controller: App\Controller\SecurityController::logout
+
+app_admin_dashboard:
+    path: /admin
+    controller: App\Controller\Admin\AdminDashboardController::index
+
+app_client_inscription:
+    path: /client/inscription
+    controller: App\Controller\ClientController::inscription
+    methods: [GET, POST]
+
+app_client_dashboard:
+    path: /client/dashboard
+    controller: App\Controller\ClientController::dashboard
+    methods: [GET]
+
+app_client_comptes:
+    path: /client/comptes
+    controller: App\Controller\ClientController::comptes
+    methods: [GET]
+
+app_client_compte_show:
+    path: /client/compte/{id}
+    controller: App\Controller\ClientController::showCompte
+    methods: [GET]
+
+app_client_virement:
+    path: /client/virement
+    controller: App\Controller\ClientController::virement
+    methods: [GET, POST]
+
+app_client_profil:
+    path: /client/profil
+    controller: App\Controller\ClientController::profil
+    methods: [GET, POST]
+
+app_banque_dashboard:
+    path: /banque/dashboard
+    controller: App\Controller\BanqueController::dashboard
+    methods: [GET]
+
+app_banque_clients:
+    path: /banque/clients
+    controller: App\Controller\BanqueController::clients
+    methods: [GET]
+
+app_banque_client_show:
+    path: /banque/client/{id}
+    controller: App\Controller\BanqueController::showClient
+    methods: [GET]
+
+app_banque_client_activer:
+    path: /banque/client/{id}/activer
+    controller: App\Controller\BanqueController::activerClient
+    methods: [POST]
+
+app_banque_client_desactiver:
+    path: /banque/client/{id}/desactiver
+    controller: App\Controller\BanqueController::desactiverClient
+    methods: [POST]
+
+app_banque_compte_activer:
+    path: /banque/compte/{id}/activer
+    controller: App\Controller\BanqueController::activerCompte
+    methods: [POST]
+
+app_banque_compte_desactiver:
+    path: /banque/compte/{id}/desactiver
+    controller: App\Controller\BanqueController::desactiverCompte
+    methods: [POST]
+
+app_banque_compte_create:
+    path: /banque/compte/create
+    controller: App\Controller\BanqueController::createCompte
+    methods: [GET, POST]
