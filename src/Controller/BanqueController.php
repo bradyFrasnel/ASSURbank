@@ -36,14 +36,14 @@ class BanqueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $banque->setRole('ROLE_BANQUE');
-            $banque->setStatut('actif');
+            $banque->setStatut('inactif');
             $banque->setDateCreation(new \DateTimeImmutable());
             $banque->setPassword($passwordHasher->hashPassword($banque, $form->get('plainPassword')->getData()));
 
             $entityManager->persist($banque);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Banque inscrite avec succès. Vous pouvez vous connecter.');
+            $this->addFlash('success', 'Banque inscrite avec succès. Votre compte est en attente de validation administrative.');
 
             return $this->redirectToRoute('app_login_banque');
         }
@@ -53,28 +53,15 @@ class BanqueController extends AbstractController
 
     #[Route('/dashboard', name: 'app_banque_dashboard', methods: ['GET'])]
     #[IsGranted('ROLE_BANQUE')]
-    public function dashboard(
-        ClientRepository $clientRepository,
-        CompteRepository $compteRepository
-    ): Response {
+    public function dashboard(ClientRepository $clientRepository): Response
+    {
         /** @var Banque $banque */
         $banque = $this->getUser();
 
-        // Récupérer les clients de cette banque
-        $clients = $clientRepository->findBy(['banque' => $banque]);
-
-        // Calculer les statistiques
-        $totalClients = count($clients);
-        $totalComptes = 0;
-        $montantTotal = 0;
-
-        foreach ($clients as $client) {
-            $comptes = $compteRepository->findBy(['client' => $client]);
-            $totalComptes += count($comptes);
-            foreach ($comptes as $compte) {
-                $montantTotal += $compte->getSolde();
-            }
-        }
+        $clients = $clientRepository->findRecentByBanque($banque, 5);
+        $totalClients = $clientRepository->countByBanque($banque);
+        $totalComptes = $clientRepository->countComptesByBanque($banque);
+        $montantTotal = $clientRepository->sumSoldeByBanque($banque);
 
         return $this->render('banque/dashboard.html.twig', [
             'banque' => $banque,

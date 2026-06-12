@@ -28,12 +28,16 @@ class AdminDashboardController extends AbstractController
         $banques = $pagination->items;
         $totalBanques = $pagination->total;
         $banquesActives = $banqueRepository->countByStatut('actif');
+        $banquesInactives = $banqueRepository->countByStatut('inactif');
+        $banquesEnAttente = $banqueRepository->findBy(['statut' => 'inactif'], ['dateCreation' => 'DESC'], 10);
 
         return $this->render('admin/admin_dashboard/index.html.twig', [
             'banques' => $banques,
             'pagination' => $pagination,
             'totalBanques' => $totalBanques,
             'banquesActives' => $banquesActives,
+            'banquesInactives' => $banquesInactives,
+            'banquesEnAttente' => $banquesEnAttente,
             'totalClients' => $clientRepository->countAll(),
             'totalTransactions' => $transactionRepository->countAll(),
             'volumeTransactions' => $transactionRepository->sumMontantSucces(),

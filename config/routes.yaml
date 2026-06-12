@@ -84,6 +84,16 @@ app_client_compte_show:
     controller: App\Controller\ClientController::showCompte
     methods: [GET]
 
+app_client_compte_depot:
+    path: /client/compte/{id}/depot
+    controller: App\Controller\ClientController::depotCompte
+    methods: [POST]
+
+app_client_compte_retrait:
+    path: /client/compte/{id}/retrait
+    controller: App\Controller\ClientController::retraitCompte
+    methods: [POST]
+
 app_client_virement:
     path: /client/virement
     controller: App\Controller\ClientController::virement

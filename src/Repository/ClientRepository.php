@@ -43,6 +43,52 @@ class ClientRepository extends ServiceEntityRepository implements PasswordUpgrad
             ->getSingleScalarResult();
     }
 
+    public function countByBanque(Banque $banque): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.banque = :banque')
+            ->setParameter('banque', $banque)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countComptesByBanque(Banque $banque): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(co.id)')
+            ->join('c.comptes', 'co')
+            ->andWhere('c.banque = :banque')
+            ->setParameter('banque', $banque)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function sumSoldeByBanque(Banque $banque): float
+    {
+        return (float) $this->createQueryBuilder('c')
+            ->select('COALESCE(SUM(co.solde), 0)')
+            ->join('c.comptes', 'co')
+            ->andWhere('c.banque = :banque')
+            ->setParameter('banque', $banque)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return Client[]
+     */
+    public function findRecentByBanque(Banque $banque, int $limit = 5): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.banque = :banque')
+            ->setParameter('banque', $banque)
+            ->orderBy('c.dateCreation', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * @return PaginatedResult<Client>
      */

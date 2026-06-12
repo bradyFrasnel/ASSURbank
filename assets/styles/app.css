@@ -1,3 +1,7 @@
+html {
+    font-size: 13px;
+}
+
 :root {
     --ab-primary: #1e3a5f;
     --ab-primary-light: #2d5a8e;
@@ -10,6 +14,8 @@
 body {
     background-color: var(--ab-bg);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.55;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -22,17 +28,19 @@ main {
 .navbar-brand {
     font-weight: 700;
     letter-spacing: 0.5px;
+    font-size: 1rem;
 }
 
 .navbar-ab {
-    background: linear-gradient(135deg, var(--ab-primary) 0%, var(--ab-primary-light) 100%) !important;
+    background: var(--ab-primary) !important;
+    color: #fff;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 
 .hero-section {
     background: linear-gradient(135deg, var(--ab-primary) 0%, var(--ab-primary-light) 60%, #3d7ab5 100%);
     color: #fff;
-    padding: 4rem 0 5rem;
+    padding: 2.5rem 0 3.5rem;
     position: relative;
     overflow: hidden;
 }
@@ -49,7 +57,7 @@ main {
 }
 
 .hero-title {
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
     font-weight: 800;
     letter-spacing: -0.5px;
 }
@@ -82,14 +90,14 @@ main {
 }
 
 .portal-icon {
-    width: 72px;
-    height: 72px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
 }
 
 .portal-icon-client { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
@@ -104,7 +112,7 @@ main {
 }
 
 .feature-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--ab-primary);
 }
 
@@ -116,7 +124,7 @@ main {
 }
 
 .auth-card-header {
-    padding: 2rem;
+    padding: 1.25rem;
     text-align: center;
     color: #fff;
 }
@@ -126,7 +134,7 @@ main {
 .auth-card-header.danger  { background: linear-gradient(135deg, #dc3545, #b02a37); }
 
 .auth-icon {
-    font-size: 3rem;
+    font-size: 2rem;
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -144,8 +152,14 @@ main {
 
 .page-header {
     border-bottom: 2px solid #e9ecef;
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.page-header h1,
+.page-header h2,
+.page-header h3 {
+    font-size: 1.35rem;
 }
 
 .table-card {
@@ -158,7 +172,7 @@ main {
 .footer-ab {
     background: var(--ab-primary);
     color: rgba(255, 255, 255, 0.85);
-    padding: 1.5rem 0;
+    padding: 1rem 0;
     margin-top: auto;
 }
 
@@ -166,7 +180,34 @@ main {
 .badge-statut-inactif { background-color: #f8d7da; color: #842029; }
 
 .btn-portal {
-    padding: 0.65rem 1.25rem;
+    padding: 0.5rem 1rem;
     font-weight: 600;
     border-radius: 8px;
+    font-size: 0.95rem;
+    min-height: 2.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Loading state for buttons/links */
+.btn-portal.is-loading {
+    pointer-events: none;
+    opacity: 0.85;
+}
+.btn-portal.is-loading::after {
+    content: '';
+    position: absolute;
+    right: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,0.9);
+    border-top-color: rgba(255,255,255,0.25);
+    border-radius: 50%;
+    animation: ab-spin 0.7s linear infinite;
+}
+
+@keyframes ab-spin {
+    to { transform: translateY(-50%) rotate(360deg); }
 }

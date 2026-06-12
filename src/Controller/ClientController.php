@@ -12,6 +12,7 @@ use App\Repository\BanqueRepository;
 use App\Repository\CompteRepository;
 use App\Repository\TransactionRepository;
 use App\Service\VirementService;
+use App\Service\CompteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,6 +111,54 @@ class ClientController extends AbstractController
             'pagination' => $pagination,
             'transactions' => $pagination->items,
         ]);
+    }
+
+    #[Route('/compte/{id}/depot', name: 'app_client_compte_depot', methods: ['POST'])]
+    #[IsGranted('ROLE_CLIENT')]
+    public function depotCompte(Compte $compte, Request $request, CompteService $compteService): Response
+    {
+        /** @var Client $client */
+        $client = $this->getUser();
+
+        if ($compte->getClient() !== $client) {
+            throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
+        }
+
+        $montant = (float) str_replace(',', '.', (string) $request->request->get('montant'));
+        $libelle = (string) $request->request->get('libelle', 'Dépôt');
+
+        try {
+            $compteService->depot($compte, $montant, $libelle);
+            $this->addFlash('success', 'Dépôt effectué.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_client_compte_show', ['id' => $compte->getId()]);
+    }
+
+    #[Route('/compte/{id}/retrait', name: 'app_client_compte_retrait', methods: ['POST'])]
+    #[IsGranted('ROLE_CLIENT')]
+    public function retraitCompte(Compte $compte, Request $request, CompteService $compteService): Response
+    {
+        /** @var Client $client */
+        $client = $this->getUser();
+
+        if ($compte->getClient() !== $client) {
+            throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
+        }
+
+        $montant = (float) str_replace(',', '.', (string) $request->request->get('montant'));
+        $libelle = (string) $request->request->get('libelle', 'Retrait');
+
+        try {
+            $compteService->retrait($compte, $montant, $libelle);
+            $this->addFlash('success', 'Retrait effectué.');
+        } catch (\Exception $e) {
+            $this->addFlash('danger', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_client_compte_show', ['id' => $compte->getId()]);
     }
 
     #[Route('/transactions', name: 'app_client_transactions', methods: ['GET'])]

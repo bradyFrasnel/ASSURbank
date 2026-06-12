@@ -35,6 +35,45 @@
         </div>
     </div>
 
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h6 class="mb-2">Dépôt</h6>
+                {% if compte.statut != 'actif' %}
+                    <div class="text-muted small">Ce compte est inactif — opération indisponible.</div>
+                {% else %}
+                    <form method="post" action="{{ path('app_client_compte_depot', {id: compte.id}) }}" class="row g-2">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
+                        <div class="col-8">
+                            <input type="number" step="0.01" name="montant" class="form-control" placeholder="Montant">
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-success w-100" type="submit">Déposer</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3">
+                <h6 class="mb-2">Retrait</h6>
+                {% if compte.statut != 'actif' %}
+                    <div class="text-muted small">Ce compte est inactif — opération indisponible.</div>
+                {% else %}
+                    <form method="post" action="{{ path('app_client_compte_retrait', {id: compte.id}) }}" class="row g-2">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('submit') }}">
+                        <div class="col-8">
+                            <input type="number" step="0.01" name="montant" class="form-control" placeholder="Montant">
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-danger w-100" type="submit">Retirer</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
     <div class="table-card card">
         <div class="card-header bg-white py-3">
             <h5 class="mb-0 fw-bold">Historique des transactions</h5>

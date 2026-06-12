@@ -151,4 +151,36 @@ class Compte
 
         return $this;
     }
+
+    /**
+     * Créditer le compte.
+     */
+    public function deposer(float $montant): static
+    {
+        if ($montant <= 0) {
+            throw new \InvalidArgumentException('Le montant du dépôt doit être strictement positif.');
+        }
+
+        $this->solde = ($this->solde ?? 0.0) + $montant;
+
+        return $this;
+    }
+
+    /**
+     * Débiter le compte (retrait).
+     */
+    public function retirer(float $montant): static
+    {
+        if ($montant <= 0) {
+            throw new \InvalidArgumentException('Le montant du retrait doit être strictement positif.');
+        }
+
+        if (($this->solde ?? 0.0) < $montant) {
+            throw new \RuntimeException('Solde insuffisant pour effectuer ce retrait.');
+        }
+
+        $this->solde = $this->solde - $montant;
+
+        return $this;
+    }
 }
