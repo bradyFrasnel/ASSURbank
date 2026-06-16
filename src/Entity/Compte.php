@@ -136,7 +136,6 @@ class Compte
             $this->transactions->add($transaction);
             $transaction->setCompteSource($this);
         }
-
         return $this;
     }
 

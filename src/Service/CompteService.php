@@ -4,13 +4,18 @@ namespace App\Service;
 
 use App\Entity\Compte;
 use App\Entity\Transaction;
+use App\Event\DepotEffectueEvent;
+use App\Event\RetraitEffectueEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CompteService
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     /**
@@ -47,6 +52,9 @@ class CompteService
             $this->entityManager->persist($transaction);
             $this->entityManager->flush();
             $this->entityManager->commit();
+
+            // Dispatcher l'événement après le commit pour la cohérence
+            $this->dispatcher->dispatch(new DepotEffectueEvent($transaction));
 
             return $transaction;
         } catch (Exception $e) {
@@ -93,6 +101,9 @@ class CompteService
             $this->entityManager->persist($transaction);
             $this->entityManager->flush();
             $this->entityManager->commit();
+
+            // Dispatcher l'événement après le commit pour la cohérence
+            $this->dispatcher->dispatch(new RetraitEffectueEvent($transaction));
 
             return $transaction;
         } catch (Exception $e) {

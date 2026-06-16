@@ -4,16 +4,22 @@ namespace App\Service;
 
 use App\Entity\Compte;
 use App\Entity\Transaction;
+use App\Event\VirementEffectueEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class VirementService
 {
     private EntityManagerInterface $entityManager;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        EventDispatcherInterface $dispatcher,
+    ) {
         $this->entityManager = $entityManager;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -88,6 +94,9 @@ class VirementService
 
             $this->entityManager->flush();
             $this->entityManager->commit();
+
+            // Dispatcher l'événement après le commit pour la cohérence
+            $this->dispatcher->dispatch(new VirementEffectueEvent($transactionDebit, $transactionCredit));
 
             return [$transactionDebit, $transactionCredit];
 

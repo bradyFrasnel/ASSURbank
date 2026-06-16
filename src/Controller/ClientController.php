@@ -8,7 +8,8 @@ use App\Form\ChangePasswordType;
 use App\Form\ClientInscriptionType;
 use App\Form\TransactionFilterType;
 use App\Form\VirementType;
-use App\Repository\BanqueRepository;
+use App\Security\CompteVoter;
+use App\Security\TransactionVoter;
 use App\Repository\CompteRepository;
 use App\Repository\TransactionRepository;
 use App\Service\VirementService;
@@ -96,12 +97,8 @@ class ClientController extends AbstractController
         Compte $compte,
         TransactionRepository $transactionRepository,
     ): Response {
-        /** @var Client $client */
-        $client = $this->getUser();
-
-        if ($compte->getClient() !== $client) {
-            throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
-        }
+        // Vérifier l'accès avec le Voter CompteVoter
+        $this->denyAccessUnlessGranted(CompteVoter::VIEW, $compte);
 
         $page = max(1, $request->query->getInt('page', 1));
         $pagination = $transactionRepository->findByComptePaginated($compte, $page, 10);
@@ -117,12 +114,8 @@ class ClientController extends AbstractController
     #[IsGranted('ROLE_CLIENT')]
     public function depotCompte(Compte $compte, Request $request, CompteService $compteService): Response
     {
-        /** @var Client $client */
-        $client = $this->getUser();
-
-        if ($compte->getClient() !== $client) {
-            throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
-        }
+        // Vérifier que le client peut effectuer des opérations sur ce compte
+        $this->denyAccessUnlessGranted(CompteVoter::OPERATIONS, $compte);
 
         $montant = (float) str_replace(',', '.', (string) $request->request->get('montant'));
         $libelle = (string) $request->request->get('libelle', 'Dépôt');
@@ -141,12 +134,8 @@ class ClientController extends AbstractController
     #[IsGranted('ROLE_CLIENT')]
     public function retraitCompte(Compte $compte, Request $request, CompteService $compteService): Response
     {
-        /** @var Client $client */
-        $client = $this->getUser();
-
-        if ($compte->getClient() !== $client) {
-            throw $this->createAccessDeniedException('Ce compte ne vous appartient pas.');
-        }
+        // Vérifier que le client peut effectuer des opérations sur ce compte
+        $this->denyAccessUnlessGranted(CompteVoter::OPERATIONS, $compte);
 
         $montant = (float) str_replace(',', '.', (string) $request->request->get('montant'));
         $libelle = (string) $request->request->get('libelle', 'Retrait');
@@ -219,9 +208,17 @@ class ClientController extends AbstractController
             $montant = (float) $form->get('montant')->getData();
             $libelle = $form->get('libelle')->getData();
 
+            // Vérifier l'accès avec les Voters
+            try {
+                $this->denyAccessUnlessGranted(CompteVoter::OPERATIONS, $compteSource);
+                $this->denyAccessUnlessGranted(CompteVoter::VIEW, $compteDestination);
+            } catch (\Exception $e) {
+                $error = 'Vous n\'avez pas l\'autorisation d\'effectuer ce virement.';
+            }
+
             if ($compteSource === $compteDestination) {
                 $error = 'Impossible de virer vers le même compte.';
-            } else {
+            } else if (!isset($error)) {
                 try {
                     $virementService->effectuerVirement($compteSource, $compteDestination, $montant, $libelle);
                     $success = 'Virement effectué avec succès.';
