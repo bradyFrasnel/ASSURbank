@@ -44,6 +44,7 @@ class AdminDashboardController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/banque/{id}/activer', name: 'app_admin_banque_activer', methods: ['POST'])]
     public function activerBanque(Banque $banque, EntityManagerInterface $entityManager): Response
     {
         $banque->setStatut('actif');
@@ -53,6 +54,7 @@ class AdminDashboardController extends AbstractController
         return $this->redirectToRoute('app_admin_dashboard');
     }
 
+    #[Route('/admin/banque/{id}/desactiver', name: 'app_admin_banque_desactiver', methods: ['POST'])]
     public function desactiverBanque(Banque $banque, EntityManagerInterface $entityManager): Response
     {
         $banque->setStatut('inactif');

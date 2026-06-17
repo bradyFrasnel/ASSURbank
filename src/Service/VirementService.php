@@ -11,15 +11,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class VirementService
 {
-    private EntityManagerInterface $entityManager;
-    private EventDispatcherInterface $dispatcher;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        EventDispatcherInterface $dispatcher,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
-        $this->entityManager = $entityManager;
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -43,11 +38,6 @@ class VirementService
             throw new Exception('Le compte destination est désactivé.');
         }
 
-        // R1: Vérifier le solde suffisant
-        if ($compteSource->getSolde() < $montant) {
-            throw new Exception('Solde insuffisant pour effectuer ce virement.');
-        }
-
         // R3: Le solde ne peut pas être négatif (déjà vérifié par R1)
         if ($montant <= 0) {
             throw new Exception('Le montant doit être positif.');
@@ -57,6 +47,11 @@ class VirementService
         $this->entityManager->beginTransaction();
 
         try {
+            // R1: Vérifier le solde suffisant à l'intérieur de la transaction
+            if ($compteSource->getSolde() < $montant) {
+                throw new Exception('Solde insuffisant pour effectuer ce virement.');
+            }
+
             // Débiter le compte source
             $nouveauSoldeSource = $compteSource->getSolde() - $montant;
             $compteSource->setSolde($nouveauSoldeSource);
@@ -101,7 +96,9 @@ class VirementService
             return [$transactionDebit, $transactionCredit];
 
         } catch (Exception $e) {
-            $this->entityManager->rollback();
+            if ($this->entityManager->getConnection()->isTransactionActive()) {
+                $this->entityManager->rollback();
+            }
 
             // Enregistrer la transaction échouée
             $transactionEchouee = new Transaction();

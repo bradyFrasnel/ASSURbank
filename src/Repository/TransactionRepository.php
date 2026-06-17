@@ -47,8 +47,9 @@ class TransactionRepository extends ServiceEntityRepository
     public function findByClientPaginated(Client $client, int $page = 1, int $perPage = 10, array $filters = []): PaginatedResult
     {
         $qb = $this->createQueryBuilder('t')
-            ->join('t.compteSource', 'cs')
-            ->andWhere('cs.client = :client')
+            ->leftJoin('t.compteSource', 'cs')
+            ->leftJoin('t.compteDestination', 'cd')
+            ->andWhere('cs.client = :client OR cd.client = :client')
             ->setParameter('client', $client)
             ->orderBy('t.dateTransaction', 'DESC');
 

@@ -39,4 +39,12 @@ when@test:
                 algorithm: auto
                 cost: 4
                 time_cost: 3
-                memory_cost: 10
+                memory_cost: 10240 # Minimum 10k requis par Argon2
+
+when@dev:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto # Symfony choisira le meilleur algorithme (souvent Argon2id)
+                memory_cost: 16384 # Réduit pour le développement (par exemple, 16MB au lieu de 64MB)
+                time_cost: 3     # Le minimum requis par Sodium/Symfony est 3

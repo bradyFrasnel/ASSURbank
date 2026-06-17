@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\Client;
 use App\Entity\Compte;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -25,7 +26,7 @@ class CompteVoter extends Voter
             && $subject instanceof Compte;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $compte, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
 
@@ -34,8 +35,8 @@ class CompteVoter extends Voter
         }
 
         // Admin a tous les droits
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return true;
+        if ($user instanceof Client && $user->getRole() === 'ROLE_ADMIN') {
+             return true;
         }
 
         // Seul un client peut effectuer ces actions
@@ -44,9 +45,9 @@ class CompteVoter extends Voter
         }
 
         return match($attribute) {
-            self::VIEW => $this->peutVoir($compte, $user),
-            self::EDIT => $this->peutModifier($compte, $user),
-            self::OPERATIONS => $this->peutEffectuerOperations($compte, $user),
+            self::VIEW => $this->peutVoir($subject, $user),
+            self::EDIT => $this->peutModifier($subject, $user),
+            self::OPERATIONS => $this->peutEffectuerOperations($subject, $user),
             default => false,
         };
     }

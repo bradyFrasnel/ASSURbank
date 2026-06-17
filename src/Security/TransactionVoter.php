@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\Client;
 use App\Entity\Transaction;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -22,7 +23,7 @@ class TransactionVoter extends Voter
         return $attribute === self::VIEW && $subject instanceof Transaction;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $transaction, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
     {
         $user = $token->getUser();
 
@@ -41,8 +42,8 @@ class TransactionVoter extends Voter
         }
 
         // Le client peut voir la transaction si elle concerne un de ses comptes
-        $compteSource = $transaction->getCompteSource();
-        $compteDestination = $transaction->getCompteDestination();
+        $compteSource = $subject->getCompteSource();
+        $compteDestination = $subject->getCompteDestination();
 
         $appartientAuClient = false;
         if ($compteSource && $compteSource->getClient() === $user) {
