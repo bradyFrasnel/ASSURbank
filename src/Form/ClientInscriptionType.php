@@ -33,7 +33,7 @@ class ClientInscriptionType extends AbstractType
                 'class' => Banque::class,
                 'choice_label' => 'nom',
                 'label' => 'Banque',
-                'placeholder' => '— Choisir une banque —',
+                'placeholder' => 'hoisir votre banque !!',
                 'query_builder' => fn ($repo) => $repo->createQueryBuilder('b')
                     ->andWhere('b.statut = :statut')
                     ->setParameter('statut', 'actif')
