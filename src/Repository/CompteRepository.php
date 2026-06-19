@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Banque;
+use App\Entity\Client;
 use App\Entity\Compte;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,28 +18,28 @@ class CompteRepository extends ServiceEntityRepository
         parent::__construct($registry, Compte::class);
     }
 
-    //    /**
-    //     * @return Compte[] Returns an array of Compte objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function countByStatutAndBanque(Banque $banque, string $statut): int
+    {
+        return (int) $this->createQueryBuilder('co')
+            ->select('COUNT(co.id)')
+            ->join('co.client', 'c')
+            ->andWhere('c.banque = :banque')
+            ->andWhere('co.statut = :statut')
+            ->setParameter('banque', $banque)
+            ->setParameter('statut', $statut)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Compte
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function countByStatutAndClient(Client $client, string $statut): int
+    {
+        return (int) $this->createQueryBuilder('co')
+            ->select('COUNT(co.id)')
+            ->andWhere('co.client = :client')
+            ->andWhere('co.statut = :statut')
+            ->setParameter('client', $client)
+            ->setParameter('statut', $statut)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

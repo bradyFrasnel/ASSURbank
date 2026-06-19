@@ -53,6 +53,18 @@ class ClientRepository extends ServiceEntityRepository implements PasswordUpgrad
             ->getSingleScalarResult();
     }
 
+    public function countByStatutAndBanque(Banque $banque, string $statut): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.banque = :banque')
+            ->andWhere('c.statut = :statut')
+            ->setParameter('banque', $banque)
+            ->setParameter('statut', $statut)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function countComptesByBanque(Banque $banque): int
     {
         return (int) $this->createQueryBuilder('c')
@@ -71,6 +83,17 @@ class ClientRepository extends ServiceEntityRepository implements PasswordUpgrad
             ->join('c.comptes', 'co')
             ->andWhere('c.banque = :banque')
             ->setParameter('banque', $banque)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function sumSoldeByClient(Client $client): float
+    {
+        return (float) $this->createQueryBuilder('c')
+            ->select('COALESCE(SUM(co.solde), 0)')
+            ->join('c.comptes', 'co')
+            ->andWhere('c = :client')
+            ->setParameter('client', $client)
             ->getQuery()
             ->getSingleScalarResult();
     }

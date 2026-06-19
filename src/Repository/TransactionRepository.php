@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Dto\PaginatedResult;
+use App\Entity\Banque;
 use App\Entity\Client;
 use App\Entity\Compte;
 use App\Entity\Transaction;
@@ -37,6 +38,68 @@ class TransactionRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
 
         return (float) $result;
+    }
+
+    public function countByBanque(Banque $banque): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->leftJoin('t.compteSource', 'cs')
+            ->leftJoin('cs.client', 'c')
+            ->andWhere('c.banque = :banque')
+            ->setParameter('banque', $banque)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function sumMontantSuccesByBanque(Banque $banque): float
+    {
+        $result = $this->createQueryBuilder('t')
+            ->select('COALESCE(SUM(t.montant), 0)')
+            ->leftJoin('t.compteSource', 'cs')
+            ->leftJoin('cs.client', 'c')
+            ->andWhere('c.banque = :banque')
+            ->andWhere('t.statut = :statut')
+            ->setParameter('banque', $banque)
+            ->setParameter('statut', 'succès')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (float) $result;
+    }
+
+    public function sumCreditDebitByClient(Client $client): array
+    {
+        $result = $this->createQueryBuilder('t')
+            ->select('t.type, COALESCE(SUM(t.montant), 0) as total')
+            ->leftJoin('t.compteSource', 'cs')
+            ->leftJoin('t.compteDestination', 'cd')
+            ->andWhere('cs.client = :client OR cd.client = :client')
+            ->andWhere('t.statut = :statut')
+            ->setParameter('client', $client)
+            ->setParameter('statut', 'succès')
+            ->groupBy('t.type')
+            ->getQuery()
+            ->getResult();
+
+        $data = ['crédit' => 0, 'débit' => 0];
+        foreach ($result as $row) {
+            $data[$row['type']] = (float) $row['total'];
+        }
+
+        return $data;
+    }
+
+    public function countByClient(Client $client): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->leftJoin('t.compteSource', 'cs')
+            ->leftJoin('t.compteDestination', 'cd')
+            ->andWhere('cs.client = :client OR cd.client = :client')
+            ->setParameter('client', $client)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**

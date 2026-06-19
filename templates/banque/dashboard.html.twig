@@ -30,13 +30,36 @@
         </div>
         <div class="col-md-3 col-6">
             <div class="dashboard-stat card text-center p-3">
-                <p class="text-muted small mb-1">Statut</p>
-                <span class="badge badge-statut-{{ banque.statut }} fs-6">{{ banque.statut }}</span>
+                <p class="text-muted small mb-1">Transactions</p>
+                <h3 class="text-warning mb-0">{{ totalTransactions }}</h3>
             </div>
         </div>
     </div>
 
-    <div class="table-card card">
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">Répartition des clients</h6>
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="clientsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title fw-bold mb-3">Répartition des comptes</h6>
+                    <div class="chart-container" style="position: relative; height: 300px;">
+                        <canvas id="comptesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
             <h5 class="mb-0 fw-bold">Clients récents</h5>
             <a href="{{ path('app_banque_clients') }}" class="btn btn-sm btn-outline-primary">Tous les clients</a>
@@ -82,4 +105,102 @@
         </a>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chart clients
+        new Chart(document.getElementById('clientsChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Actifs', 'Inactifs'],
+                datasets: [{
+                    data: [{{ clientsActifs }}, {{ clientsInactifs }}],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 4,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1200
+                }
+            }
+        });
+
+        // Chart comptes
+        new Chart(document.getElementById('comptesChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Actifs', 'Inactifs'],
+                datasets: [{
+                    data: [{{ comptesActifs }}, {{ comptesInactifs }}],
+                    backgroundColor: ['#059669', '#dc2626'],
+                    borderWidth: 4,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    animateScale: true,
+                    duration: 1200
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}

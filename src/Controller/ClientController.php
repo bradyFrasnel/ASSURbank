@@ -10,6 +10,7 @@ use App\Form\TransactionFilterType;
 use App\Form\VirementType;
 use App\Security\CompteVoter;
 use App\Security\TransactionVoter;
+use App\Repository\ClientRepository;
 use App\Repository\CompteRepository;
 use App\Repository\TransactionRepository;
 use App\Repository\BanqueRepository;
@@ -66,16 +67,28 @@ class ClientController extends AbstractController
     public function dashboard(
         CompteRepository $compteRepository,
         TransactionRepository $transactionRepository,
+        ClientRepository $clientRepository,
     ): Response {
         /** @var Client $client */
         $client = $this->getUser();
         $comptes = $compteRepository->findBy(['client' => $client]);
         $pagination = $transactionRepository->findByClientPaginated($client, 1, 5);
+        $totalComptes = count($comptes);
+        $comptesActifs = $compteRepository->countByStatutAndClient($client, 'actif');
+        $soldeTotal = $clientRepository->sumSoldeByClient($client);
+        $totalTransactions = $transactionRepository->countByClient($client);
+        $creditDebit = $transactionRepository->sumCreditDebitByClient($client);
 
         return $this->render('client/dashboard.html.twig', [
             'client' => $client,
             'comptes' => $comptes,
             'transactions' => $pagination->items,
+            'totalComptes' => $totalComptes,
+            'comptesActifs' => $comptesActifs,
+            'soldeTotal' => $soldeTotal,
+            'totalTransactions' => $totalTransactions,
+            'totalCredit' => $creditDebit['crédit'],
+            'totalDebit' => $creditDebit['débit'],
         ]);
     }
 

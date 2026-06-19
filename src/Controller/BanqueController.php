@@ -9,6 +9,7 @@ use App\Form\BanqueInscriptionType;
 use App\Form\CompteCreateType;
 use App\Repository\ClientRepository;
 use App\Repository\CompteRepository;
+use App\Repository\TransactionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,22 +54,34 @@ class BanqueController extends AbstractController
 
     #[Route('/dashboard', name: 'app_banque_dashboard', methods: ['GET'])]
     #[IsGranted('ROLE_BANQUE')]
-    public function dashboard(ClientRepository $clientRepository): Response
+    public function dashboard(ClientRepository $clientRepository, CompteRepository $compteRepository, TransactionRepository $transactionRepository): Response
     {
         /** @var Banque $banque */
         $banque = $this->getUser();
 
         $clients = $clientRepository->findRecentByBanque($banque, 5);
         $totalClients = $clientRepository->countByBanque($banque);
+        $clientsActifs = $clientRepository->countByStatutAndBanque($banque, 'actif');
+        $clientsInactifs = $clientRepository->countByStatutAndBanque($banque, 'inactif');
         $totalComptes = $clientRepository->countComptesByBanque($banque);
+        $comptesActifs = $compteRepository->countByStatutAndBanque($banque, 'actif');
+        $comptesInactifs = $compteRepository->countByStatutAndBanque($banque, 'inactif');
         $montantTotal = $clientRepository->sumSoldeByBanque($banque);
+        $totalTransactions = $transactionRepository->countByBanque($banque);
+        $montantTransactions = $transactionRepository->sumMontantSuccesByBanque($banque);
 
         return $this->render('banque/dashboard.html.twig', [
             'banque' => $banque,
             'clients' => $clients,
             'totalClients' => $totalClients,
+            'clientsActifs' => $clientsActifs,
+            'clientsInactifs' => $clientsInactifs,
             'totalComptes' => $totalComptes,
+            'comptesActifs' => $comptesActifs,
+            'comptesInactifs' => $comptesInactifs,
             'montantTotal' => $montantTotal,
+            'totalTransactions' => $totalTransactions,
+            'montantTransactions' => $montantTransactions,
         ]);
     }
 
