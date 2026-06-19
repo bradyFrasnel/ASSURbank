@@ -5,20 +5,26 @@ namespace App\Security;
 use App\Entity\Client;
 use App\Entity\Compte;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Voter pour autoriser les actions sur un Compte
- * 
- * Seul le client propriétaire du compte (ou un admin) peut le voir/modifier
+ *
+ * Seul le client propriétaire du compte (ou un admin/banque) peut le voir/modifier
  */
 class CompteVoter extends Voter
 {
     public const VIEW = 'compte_view';
     public const EDIT = 'compte_edit';
     public const OPERATIONS = 'compte_operations'; // Dépôt, retrait, virement
+
+    public function __construct(
+        private readonly AccessDecisionManagerInterface $accessDecisionManager,
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -34,8 +40,13 @@ class CompteVoter extends Voter
             return false;
         }
 
-        // Admin a tous les droits
-        if ($user instanceof Client && $user->getRole() === 'ROLE_ADMIN') {
+        // Admin a tous les droits (grâce à la hiérarchie)
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
+             return true;
+        }
+
+        // Banque a tous les droits sur ses clients
+        if ($this->accessDecisionManager->decide($token, ['ROLE_BANQUE'])) {
              return true;
         }
 

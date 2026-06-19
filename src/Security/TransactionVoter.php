@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\Client;
 use App\Entity\Transaction;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,6 +18,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class TransactionVoter extends Voter
 {
     public const VIEW = 'transaction_view';
+
+    public function __construct(
+        private readonly AccessDecisionManagerInterface $accessDecisionManager,
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -31,8 +37,13 @@ class TransactionVoter extends Voter
             return false;
         }
 
-        // Admin voit tout
-        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+        // Admin voit tout (grâce à la hiérarchie)
+        if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
+            return true;
+        }
+
+        // Banque voit tout
+        if ($this->accessDecisionManager->decide($token, ['ROLE_BANQUE'])) {
             return true;
         }
 
