@@ -36,6 +36,11 @@ app_login_admin:
     controller: App\Controller\SecurityController::loginAdmin
     methods: [GET]
 
+app_clear_rate_limit:
+    path: /login/clear-rate-limit
+    controller: App\Controller\SecurityController::clearRateLimitSession
+    methods: [POST]
+
 app_logout:
     path: /logout
     controller: App\Controller\SecurityController::logout

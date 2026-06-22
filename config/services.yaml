@@ -17,6 +17,10 @@ services:
             $loginIpLimiter: '@limiter.login_ip'
             $loginUsernameLimiter: '@limiter.login_username'
 
+    # Alias pour les handlers de sécurité
+    Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface: '@App\Security\LoginSuccessHandler'
+    Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface: '@App\Security\LoginFailureHandler'
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:

@@ -22,6 +22,9 @@
                         </div>
                     {% endif %}
 
+                    {% set isRateLimited = app.session.get('is_rate_limited', false) %}
+                    {% set waitTime = app.session.get('rate_limit_wait_time', 0) %}
+
                     {% if error %}
                         <div class="alert alert-danger py-2">
                             <i class="bi bi-exclamation-triangle me-1"></i>
@@ -29,7 +32,7 @@
                         </div>
                     {% endif %}
 
-                    <form method="post" action="{{ path('app_login') }}">
+                    <form method="post" action="{{ path('app_login') }}" id="loginForm" {% if isRateLimited %}class="opacity-50" style="pointer-events: none;"{% endif %}>
                         <input type="hidden" name="_login_type" value="{{ login_type }}">
 
                         <div class="mb-3">
@@ -37,7 +40,7 @@
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                 <input type="email" value="{{ last_username }}" name="_username" id="username"
-                                       class="form-control" autocomplete="email" required autofocus
+                                       class="form-control" autocomplete="email" {% if isRateLimited %}disabled{% endif %} required autofocus
                                        placeholder="votre@email.fr">
                             </div>
                         </div>
@@ -47,19 +50,23 @@
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                 <input type="password" name="_password" id="password"
-                                       class="form-control" autocomplete="current-password" required
+                                       class="form-control" autocomplete="current-password" {% if isRateLimited %}disabled{% endif %} required
                                        placeholder="••••••••">
                             </div>
                         </div>
 
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                        <button class="btn btn-{{ color }} w-100 btn-portal py-2" type="submit">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                        <button class="btn btn-{{ color }} w-100 btn-portal py-2" type="submit" {% if isRateLimited %}disabled style="cursor: not-allowed;"{% endif %} id="loginBtn">
+                            {% if isRateLimited %}
+                                <i class="bi bi-clock me-1"></i> <span id="countdown">{{ waitTime }}</span> secondes
+                            {% else %}
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                            {% endif %}
                         </button>
                     </form>
 
-                    {% if inscription_route %}
+                    {% if inscription_route and not isRateLimited %}
                         <hr class="my-3">
                         <p class="text-center text-muted small mb-2">Pas encore de compte ?</p>
                         <a href="{{ path(inscription_route) }}" class="btn btn-outline-{{ color }} w-100 btn-portal">
@@ -77,4 +84,37 @@
         </div>
     </div>
 </div>
+
+{% if isRateLimited and waitTime > 0 %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let timeLeft = {{ waitTime }};
+    const countdownEl = document.getElementById('countdown');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginForm = document.getElementById('loginForm');
+    const inputs = loginForm.querySelectorAll('input');
+
+    const interval = setInterval(function() {
+        timeLeft--;
+        
+        if (countdownEl) {
+            countdownEl.textContent = timeLeft;
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            
+            // Réactiver le formulaire, sans recharger la page !
+            loginForm.classList.remove('opacity-50');
+            loginForm.style.pointerEvents = 'auto';
+            inputs.forEach(input => input.disabled = false);
+            loginBtn.disabled = false;
+            loginBtn.style.cursor = 'pointer';
+            loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Se connecter';
+        }
+    }, 1000);
+});
+</script>
+{% endif %}
+
 {% endblock %}

@@ -1,18 +1,18 @@
 framework:
     rate_limiter:
-        # Limiteur de connexion (5 tentatives par minute par IP)
+        # Limiter de connexion (3 tentatives par minute par IP)
         login_ip:
             policy: sliding_window
-            limit: 5
+            limit: 2
             interval: '60 seconds'
 
-        # Limiteur par username (5 tentatives par minute par utilisateur)
+        # Limiter par username (3 tentatives par minute par utilisateur)
         login_username:
             policy: sliding_window
-            limit: 5
+            limit: 2
             interval: '60 seconds'
 
-        # Limiteur global (éviter les attaques massives)
+        # Limiter global (éviter les attaques massives)
         api_global:
             policy: token_bucket
             limit: 100

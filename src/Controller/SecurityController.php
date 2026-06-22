@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -58,6 +60,12 @@ class SecurityController extends AbstractController
         ]);
     }
 
+    public function clearRateLimitSession(): JsonResponse
+    {
+        $this->cleanRateLimitSession();
+        return new JsonResponse(['success' => true]);
+    }
+
     public function loginCheck(): never
     {
         throw new \LogicException('Cette route est interceptée par le firewall de sécurité.');
@@ -66,6 +74,15 @@ class SecurityController extends AbstractController
     public function logout(): void
     {
         throw new \LogicException('Cette route est interceptée par le firewall de sécurité.');
+    }
+
+    private function cleanRateLimitSession(): void
+    {
+        $session = $this->container->get('request_stack')->getSession();
+        if ($session) {
+            $session->remove('rate_limit_wait_time');
+            $session->remove('is_rate_limited');
+        }
     }
 
     /**
