@@ -2,47 +2,74 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\BanqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BanqueRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_BANQUE_EMAIL', fields: ['email'])]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['banque:read']],
+    denormalizationContext: ['groups' => ['banque:write']]
+)]
 class Banque implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['banque:read', 'client:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['banque:read', 'banque:write', 'client:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['banque:read', 'banque:write', 'client:read'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['banque:write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['banque:read', 'banque:write'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['banque:read', 'banque:write'])]
     private ?string $statut = null;
 
     #[ORM\Column]
+    #[Groups(['banque:read'])]
     private ?\DateTimeImmutable $dateCreation = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['banque:read', 'banque:write'])]
     private ?string $role = 'ROLE_BANQUE';
 
     /**
      * @var Collection<int, Client>
      */
     #[ORM\OneToMany(targetEntity: Client::class, mappedBy: 'banque')]
+    #[Groups(['banque:read'])]
     private Collection $clients;
 
     public function __construct()

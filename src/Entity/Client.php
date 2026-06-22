@@ -2,57 +2,91 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ApiFilter(SearchFilter::class, properties: ['nom' => 'partial', 'prenom' => 'partial', 'email' => 'exact', 'statut' => 'exact', 'banque' => 'exact'])]
+#[ApiFilter(DateFilter::class, properties: ['dateCreation'])]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['client:read']],
+    denormalizationContext: ['groups' => ['client:write']]
+)]
 class Client implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['client:read', 'compte:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['client:read', 'client:write', 'compte:read'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['client:read', 'client:write', 'compte:read'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['client:read', 'client:write', 'compte:read'])]
     private ?string $email = null;
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column(length: 255)]
+    #[Groups(['client:write'])]
     private ?string $motDePasse = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['client:read', 'client:write'])]
     private ?string $telephone = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['client:read', 'client:write'])]
     private ?string $role = 'ROLE_CLIENT';
 
     #[ORM\Column(length: 20)]
+    #[Groups(['client:read', 'client:write'])]
     private ?string $statut = 'actif';
 
     #[ORM\Column]
+    #[Groups(['client:read'])]
     private ?\DateTimeImmutable $dateCreation = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(name: 'banque_id', referencedColumnName: 'id', nullable: true)]
+    #[Groups(['client:read', 'client:write'])]
     private ?Banque $banque = null;
 
     /**
      * @var Collection<int, Compte>
      */
     #[ORM\OneToMany(targetEntity: Compte::class, mappedBy: 'client')]
+    #[Groups(['client:read'])]
     private Collection $comptes;
 
     public function __construct()

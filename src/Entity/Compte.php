@@ -2,42 +2,74 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CompteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CompteRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact', 'statut' => 'exact', 'client' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['solde', 'dateCreation'])]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['compte:read']],
+    denormalizationContext: ['groups' => ['compte:write']]
+)]
 class Compte
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['compte:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['compte:read', 'compte:write'])]
     private ?string $numeroCompte = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['compte:read', 'compte:write'])]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Groups(['compte:read', 'compte:write'])]
     private ?float $solde = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['compte:read', 'compte:write'])]
     private ?string $statut = null;
 
     #[ORM\Column]
+    #[Groups(['compte:read'])]
     private ?\DateTimeImmutable $dateCreation = null;
 
     #[ORM\ManyToOne(inversedBy: 'comptes')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['compte:read', 'compte:write'])]
     private ?Client $client = null;
 
     /**
      * @var Collection<int, Transaction>
      */
     #[ORM\OneToMany(targetEntity: Transaction::class, mappedBy: 'compteSource')]
+    #[Groups(['compte:read'])]
     private Collection $transactions;
 
     public function __construct()

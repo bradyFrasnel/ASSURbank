@@ -2,39 +2,72 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact', 'statut' => 'exact', 'compteSource' => 'exact', 'compteDestination' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['montant', 'frais', 'dateTransaction'])]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(),
+        new Put(),
+        new Delete()
+    ],
+    normalizationContext: ['groups' => ['transaction:read']],
+    denormalizationContext: ['groups' => ['transaction:write']]
+)]
 class Transaction
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['transaction:read', 'compte:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['transaction:read', 'transaction:write', 'compte:read'])]
     private ?float $montant = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['transaction:read', 'transaction:write', 'compte:read'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['transaction:read', 'transaction:write', 'compte:read'])]
     private ?string $libelle = null;
 
     #[ORM\Column]
+    #[Groups(['transaction:read', 'transaction:write', 'compte:read'])]
     private ?float $frais = null;
 
     #[ORM\Column]
+    #[Groups(['transaction:read', 'compte:read'])]
     private ?\DateTimeImmutable $dateTransaction = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['transaction:read', 'transaction:write', 'compte:read'])]
     private ?string $statut = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[Groups(['transaction:read', 'transaction:write'])]
     private ?Compte $compteSource = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['transaction:read', 'transaction:write'])]
     private ?Compte $compteDestination = null;
 
     public function getId(): ?int
@@ -126,12 +159,12 @@ class Transaction
         return $this;
     }
 
-    public function getCompteDestination(): ?compte
+    public function getCompteDestination(): ?Compte
     {
         return $this->compteDestination;
     }
 
-    public function setCompteDestination(?compte $compteDestination): static
+    public function setCompteDestination(?Compte $compteDestination): static
     {
         $this->compteDestination = $compteDestination;
 
