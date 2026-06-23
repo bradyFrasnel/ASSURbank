@@ -96,14 +96,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const interval = setInterval(function() {
         timeLeft--;
-        
+
         if (countdownEl) {
             countdownEl.textContent = timeLeft;
         }
-        
+
         if (timeLeft <= 0) {
             clearInterval(interval);
-            
+
             // Réactiver le formulaire, sans recharger la page !
             loginForm.classList.remove('opacity-50');
             loginForm.style.pointerEvents = 'auto';

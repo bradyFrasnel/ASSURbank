@@ -2,11 +2,36 @@
 
 {% block title %}ASSURbank — Banque en ligne{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: white !important;
+            padding: 60px 0;
+            margin-bottom: 0;
+        }
+        .hero-title {
+            color: white !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .hero-section p {
+            color: white !important;
+            opacity: 1 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .hero-accent {
+            color: #ffc107 !important;
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
 <section class="hero-section text-center">
     <div class="container">
         <h1 class="hero-title mb-3">Bienvenue sur <span class="hero-accent">ASSURbank</span></h1>
-        <p class="lead mb-0 opacity-90">Votre plateforme bancaire multi-banques — simple, sécurisée et accessible</p>
+        <p class="lead mb-0 text-white fw-light">Votre plateforme bancaire multi-banques — simple, sécurisée et accessible</p>
     </div>
 </section>
 
