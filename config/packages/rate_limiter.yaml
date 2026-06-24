@@ -17,3 +17,11 @@ framework:
             policy: token_bucket
             limit: 100
             rate: { amount: 100, interval: '60 seconds' }
+
+when@test:
+    framework:
+        rate_limiter:
+            login_ip:
+                limit: 100
+            login_username:
+                limit: 100

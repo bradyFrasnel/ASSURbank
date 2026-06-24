@@ -1,5 +1,5 @@
 html {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 :root {
@@ -14,8 +14,8 @@ html {
 body {
     background-color: var(--ab-bg);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    font-size: 0.95rem;
-    line-height: 1.55;
+    font-size: 0.875rem;
+    line-height: 1.5;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -28,7 +28,7 @@ main {
 .navbar-brand {
     font-weight: 700;
     letter-spacing: 0.5px;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .navbar-ab {
@@ -57,7 +57,7 @@ main {
 }
 
 .hero-title {
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     font-weight: 800;
     letter-spacing: -0.5px;
 }
@@ -90,14 +90,14 @@ main {
 }
 
 .portal-icon {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.6rem;
 }
 
 .portal-icon-client { background: rgba(13, 110, 253, 0.12); color: #0d6efd; }
@@ -112,7 +112,7 @@ main {
 }
 
 .feature-icon {
-    font-size: 2rem;
+    font-size: 1.6rem;
     color: var(--ab-primary);
 }
 
@@ -134,8 +134,8 @@ main {
 .auth-card-header.danger  { background: linear-gradient(135deg, #dc3545, #b02a37); }
 
 .auth-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.6rem;
+    margin-bottom: 0.4rem;
     display: block;
 }
 
@@ -159,7 +159,7 @@ main {
 .page-header h1,
 .page-header h2,
 .page-header h3 {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
 }
 
 .table-card {
@@ -180,11 +180,11 @@ main {
 .badge-statut-inactif { background-color: #f8d7da; color: #842029; }
 
 .btn-portal {
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.85rem;
     font-weight: 600;
     border-radius: 8px;
-    font-size: 0.95rem;
-    min-height: 2.4rem;
+    font-size: 0.85rem;
+    min-height: 2.2rem;
     position: relative;
     overflow: hidden;
 }

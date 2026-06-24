@@ -1,0 +1,39 @@
+# Augmenter les timeouts PHP
+php_value max_execution_time 300
+php_value max_input_time 300
+php_value memory_limit 512M
+
+# Désactiver les warnings en production
+php_flag display_errors off
+php_flag display_startup_errors off
+
+# Optimisation du cache
+php_flag opcache.enable on
+php_value opcache.memory_consumption 256
+php_value opcache.max_accelerated_files 20000
+
+# Configuration pour Symfony
+<IfModule mod_negotiation.c>
+    Options -MultiViews
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Rediriger vers le front controller
+    RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+    RewriteRule .* - [E=BASE:%1]
+
+    # Redirection vers index.php si le fichier n'existe pas
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ %{ENV:BASE}/index.php [L]
+
+    RewriteCond %{REQUEST_URI}::$0 ^(/.+)/(.*)::\2$
+    RewriteRule .* - [E=BASE:%1]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    <IfModule mod_alias.c>
+        RedirectMatch 307 ^/$ /index.php/
+    </IfModule>
+</IfModule>

@@ -13,5 +13,15 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: assurbank_mailpit
+    ports:
+      - "56414:1025"  # Port SMTP
+      - "56413:8025"  # Interface web
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
 volumes:
   db_data:
